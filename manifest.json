@@ -1,0 +1,30 @@
+{
+	"dependencies": [],
+	"description": "Adds many upgrades.",
+	"extra": {
+		"godot": {
+			"authors": [
+				"BurgerMinus"
+			],
+			"compatible_game_version": [
+				"1.0.4"
+			],
+			"compatible_mod_loader_version": [
+				"7.0.1"
+			],
+			"config_schema": {
+
+			},
+			"description_rich": "Adds many upgrades.",
+			"image": null,
+			"incompatibilities": [],
+			"load_before": [],
+			"optional_dependencies": [],
+			"tags": []
+		}
+	},
+	"name": "DownloadMoreRAM",
+	"namespace": "BurgerMinus",
+	"version_number": "1.0.0",
+	"website_url": "https://github.com/BurgerMinus/DownloadMoreRAM"
+}
