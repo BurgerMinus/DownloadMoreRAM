@@ -13,7 +13,7 @@ func _init() -> void:
 	Upgrades.upgrades['event_horizon'] = {
 		'name': 'Event Horizon',
 		'desc': 'Universal gravitation.',
-		'effects': ['Tackles create a gravity well that captures projectiles'],
+		'effects': ['Tackles create a gravity well that pulls in enemies and instantly captures projectiles', 'Become invincible while tackling'],
 		'type': Enemy.EnemyType.SHIELD,
 		'tier': 2, 
 		'max_stack': 1,
@@ -45,6 +45,8 @@ func _init() -> void:
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.gd"))
+	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Menus/DiagnosticsMenu.gd"))
 	
 	# completely cosmetic change, allows event horizon effect to display properly
