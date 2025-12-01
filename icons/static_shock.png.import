@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cknrxyqq66ew3"
-path="res://.godot/imported/example_upgrade.png-9e43664a79643bb3c0deb22604f6d269.ctex"
+uid="uid://crmgukuj2rut0"
+path="res://.godot/imported/static_shock.png-fae23f0b0e5d55da4d4812ac9b0a1bfa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/example_upgrade.png"
-dest_files=["res://.godot/imported/example_upgrade.png-9e43664a79643bb3c0deb22604f6d269.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/static_shock.png"
+dest_files=["res://.godot/imported/static_shock.png-fae23f0b0e5d55da4d4812ac9b0a1bfa.ctex"]
 
 [params]
 
