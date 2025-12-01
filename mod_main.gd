@@ -3,17 +3,28 @@ extends Node
 const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 
 var mod_dir_path := ""
-const upgrade_names = ['event_horizon', 'static_shock', 'refresh_overclocking']
+const upgrade_names = ['point_defense', 'event_horizon', 'static_shock', 'refresh_overclocking']
 var overwrites = []
 
 func _init() -> void:
 	
 	mod_dir_path = ModLoaderMod.get_unpacked_dir().path_join(MOD_DIR)
 	
+	Upgrades.upgrades['point_defense'] = {
+		'name': 'Point Defense',
+		'desc': 'Bullseye.',
+		'effects': ['Deflect projectiles towards the cursor with increased speed and damage', 'Overcharge punches up to 150%', '+100% punch charge speed'],
+		'type': Enemy.EnemyType.CHAIN,
+		'tier': 1, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
 	Upgrades.upgrades['event_horizon'] = {
 		'name': 'Event Horizon',
 		'desc': 'Universal gravitation.',
-		'effects': ['Tackles create a gravity well that pulls in enemies and instantly captures projectiles', 'Become invincible while tackling', 'With Static Shock: 5x shock rate while tackling'],
+		'effects': ['Tackles create a gravity well that pulls in enemies, absorbs lasers, and instantly captures projectiles', 'With Static Shock: 5x shock rate and shock stun duration while tackling'],
 		'type': Enemy.EnemyType.SHIELD,
 		'tier': 2, 
 		'max_stack': 1,
@@ -29,7 +40,7 @@ func _init() -> void:
 		'tier': 1, 
 		'max_stack': 2,
 		'ai_useable': true,
-		'credits': "Concept and Icon by Lettuce\nUpgrade by BurgerMinus"
+		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['refresh_overclocking'] = {
@@ -45,6 +56,8 @@ func _init() -> void:
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Menus/DiagnosticsMenu.gd"))
 	
