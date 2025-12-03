@@ -3,7 +3,7 @@ extends Node
 const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 
 var mod_dir_path := ""
-const upgrade_names = ['point_defense', 'event_horizon', 'static_shock', 'refresh_overclocking']
+const upgrade_names = ['point_defense', 'static_shock', 'quasar_amplification', 'event_horizon', 'refresh_overclocking']
 var overwrites = []
 
 func _init() -> void:
@@ -21,17 +21,6 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['event_horizon'] = {
-		'name': 'Event Horizon',
-		'desc': 'Universal gravitation.',
-		'effects': ['Tackles create a gravity well that pulls in enemies, absorbs lasers, and instantly captures projectiles', 'With Static Shock: 5x shock rate and shock stun duration while tackling'],
-		'type': Enemy.EnemyType.SHIELD,
-		'tier': 2, 
-		'max_stack': 1,
-		'ai_useable': true,
-		'credits': "Upgrade by BurgerMinus"
-	}
-	
 	Upgrades.upgrades['static_shock'] = {
 		'name': 'Static Shock',
 		'desc': 'First, maybe do a little harm.',
@@ -42,6 +31,32 @@ func _init() -> void:
 		'ai_useable': true,
 		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
+	
+	Upgrades.upgrades['event_horizon'] = {
+		'name': 'Event Horizon',
+		'desc': 'Universal gravitation.',
+		'effects': ['Tackles create a gravity well that pulls in enemies, absorbs lasers (boosting the damage of all collected projectiles), and instantly captures projectiles', 'With Static Shock: 5x shock rate and shock stun duration while tackling'],
+		'type': Enemy.EnemyType.SHIELD,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['quasar_amplification'] = {
+		'name': 'Quasar Amplification',
+		'desc': 'Hyperluminous.',
+		'effects': ['Instead of being fired, bullets are absorbed to charge up a Death Ray', 'Damage scales with orbital velocity', 'Death Ray cannot be canceled until it is out of charge'],
+		'type': Enemy.EnemyType.SHIELD,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['beeftank_doctrine'],
+		'ai_useable': false,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	if not Upgrades.upgrades['beeftank_doctrine'].has('precludes'):
+		Upgrades.upgrades['beeftank_doctrine']['precludes'] = []
+	Upgrades.upgrades['beeftank_doctrine']['precludes'].append('quasar_amplification')
 	
 	Upgrades.upgrades['refresh_overclocking'] = {
 		'name': 'Refresh Overclocking',
