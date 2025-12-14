@@ -1,27 +1,27 @@
 extends Object
 
-var point_defense = false
+var point_defense = {}
 
 func toggle_enhancement(chain: ModLoaderHookChain, state):
 	
 	var deadlift = chain.reference_object as Enemy
 	
-	point_defense = false
 	deadlift.charge_speed = 1.0
+	
 	chain.execute_next([state])
 	
 	var upgrades_to_apply = deadlift.get_currently_applicable_upgrades()
-	point_defense = upgrades_to_apply['point_defense'] > 0
 	
-	if point_defense:
-		deadlift.charge_speed = 2.0
+	point_defense[str(deadlift)] = upgrades_to_apply['point_defense'] > 0
+	if point_defense[str(deadlift)]:
+		deadlift.charge_speed *= 2.0
 
 # "NEEDS REFACTOR" indeed lol
 func process_melee_hits(chain: ModLoaderHookChain):
 	
 	var deadlift = chain.reference_object as Enemy
 	
-	if point_defense:
+	if point_defense[str(deadlift)]:
 		deadlift.charge_level = min(1.5, deadlift.charge_level) #-# CHANGE NUMBER ONE
 		var charged = deadlift.charge_time >= deadlift.MIN_CHARGE_TIME_TO_LAUNCH*deadlift.min_charge_time_to_launch_mult
 		
@@ -133,3 +133,11 @@ func process_melee_hits(chain: ModLoaderHookChain):
 				deadlift.velocity = rebound_vel / deadlift.mass
 	else:
 		chain.execute_next()
+
+func die(chain: ModLoaderHookChain, attack = null):
+	
+	var deadlift = chain.reference_object as Enemy
+	
+	chain.execute_next([attack])
+	
+	point_defense.erase(str(deadlift))

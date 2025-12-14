@@ -3,12 +3,23 @@ extends Node
 const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 
 var mod_dir_path := ""
-const upgrade_names = ['point_defense', 'static_shock', 'quasar_amplification', 'event_horizon', 'refresh_overclocking']
+const upgrade_names = ['improvised_nails', 'point_defense', 'static_shock', 'quasar_amplification', 'event_horizon', 'refresh_overclocking']
 var overwrites = []
 
 func _init() -> void:
 	
 	mod_dir_path = ModLoaderMod.get_unpacked_dir().path_join(MOD_DIR)
+	
+	Upgrades.upgrades['improvised_nails'] = {
+		'name': 'Improvised Nails',
+		'desc': 'If all you have is a resonance hammer, every spike of metal looks like a nail.',
+		'effects': ['Hitting enemies with Resonance Hammer launches a spray of +4 projectiles'],
+		'type': Enemy.EnemyType.SHOTGUN,
+		'tier': 1, 
+		'max_stack': 3,
+		'ai_useable': true,
+		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
+	}
 	
 	Upgrades.upgrades['point_defense'] = {
 		'name': 'Point Defense',
@@ -58,6 +69,17 @@ func _init() -> void:
 		Upgrades.upgrades['beeftank_doctrine']['precludes'] = []
 	Upgrades.upgrades['beeftank_doctrine']['precludes'].append('quasar_amplification')
 	
+	Upgrades.upgrades['sword_break'] = {
+		'name': 'sword break',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.SABER,
+		'tier': 1, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
 	Upgrades.upgrades['refresh_overclocking'] = {
 		'name': 'Refresh Overclocking',
 		'desc': 'CBF activated.',
@@ -69,10 +91,56 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
+	Upgrades.upgrades['long_stick'] = {
+		'name': 'long stick',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.BAT,
+		'tier': 1, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['jackhammer'] = {
+		'name': 'jackhammer',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.BAT,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['subcriticality', 'vortex'],
+		'ai_useable': false,
+		'credits': "Concept by Enneh\nIcon and Implementation by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['vortex'] = {
+		'name': 'vortex',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.BAT,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['subcriticality', 'jackhammer'],
+		'ai_useable': false,
+		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+	}
+	if not Upgrades.upgrades['subcriticality'].has('precludes'):
+		Upgrades.upgrades['subcriticality']['precludes'] = []
+	Upgrades.upgrades['subcriticality']['precludes'].append('vortex')
+	Upgrades.upgrades['subcriticality']['precludes'].append('jackhammer')
+	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
 	
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/EnergyBall.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/EnergyBall.hooks.gd"))
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Violence.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Violence.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Menus/DiagnosticsMenu.gd"))
 	
