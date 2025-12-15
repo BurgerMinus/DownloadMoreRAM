@@ -109,7 +109,6 @@ func _init() -> void:
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
 		'max_stack': 1,
-		'precludes': ['subcriticality', 'vortex'],
 		'ai_useable': false,
 		'credits': "Concept by Enneh\nIcon and Implementation by BurgerMinus"
 	}
@@ -121,14 +120,9 @@ func _init() -> void:
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
 		'max_stack': 1,
-		'precludes': ['subcriticality', 'jackhammer'],
 		'ai_useable': false,
 		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
 	}
-	if not Upgrades.upgrades['subcriticality'].has('precludes'):
-		Upgrades.upgrades['subcriticality']['precludes'] = []
-	Upgrades.upgrades['subcriticality']['precludes'].append('vortex')
-	Upgrades.upgrades['subcriticality']['precludes'].append('jackhammer')
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
