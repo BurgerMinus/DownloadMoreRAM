@@ -64,7 +64,14 @@ func hit_with_paddle(chain : ModLoaderHookChain, entity):
 func fire_jackhammer_laser_delayed(ball, params, vortex = false):
 	if GravityVortexScene == null:
 		GravityVortexScene = load(ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-DownloadMoreRAM/GravityVortex.tscn"))
+	
+	var combo = ball.combo
+	
 	await ball.get_tree().create_timer(jackhammer_delay*0.1).timeout
+	
+	# it is possible for the ball to land and reset its combo during the delay which is bad
+	ball.set_combo(combo)
+	
 	var ball_recall_position = fire_jackhammer_laser(ball, params, vortex)
 	var epitaph_position = ball.causality.original_source.global_position
 	
@@ -195,7 +202,7 @@ func fire_jackhammer_laser(ball, params, vortex):
 				gravity_vortex.global_position = entity.global_position
 				gravity_vortex.scale *= 0.75
 				if is_instance_valid(GameManager.player.true_host):
-					Util.set_object_elevation(gravity_vortex, entity.elevation)
+					Util.set_object_elevation(gravity_vortex, GameManager.player.true_host.elevation)
 				GameManager.objects_node.add_child(gravity_vortex)
 		
 		# If the entity stops the laser remove it from the "ignored" list

@@ -50,7 +50,16 @@ func player_action():
 	super()
 
 func _physics_process(delta):
+	
+	for i in range(0, nearby_projectiles.size()):
+		var p = nearby_projectiles[i]
+		if p is Grenade:
+			var s = p.causality.original_source
+			if 'invincible_grenades' in s and s.invincible_grenades:
+				nearby_projectiles[i] = null
+	
 	super(delta)
+	
 	if quasar_amplification:
 		if retaliating or death_ray_charge > 0.0:
 			retaliation_target_point = get_global_mouse_position()

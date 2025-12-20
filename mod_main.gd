@@ -21,6 +21,54 @@ func _init() -> void:
 		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
 	
+	Upgrades.upgrades['invincible_grenades'] = {
+		'name': 'invincible grenades',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.WHEEL,
+		'tier': 1, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['dodge_regen'] = {
+		'name': 'dodge regen',
+		'desc': '',
+		'effects': [''],
+		'type': Enemy.EnemyType.WHEEL,
+		'tier': 1, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['flash_flame'] = {
+		'name': 'Flash Flame',
+		'desc': 'External payload(s).',
+		'effects': ['Grenades create a miniature explosion on hit'],
+		'type': Enemy.EnemyType.WHEEL,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Concept by CampfireCollective\nImplementation by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['pyroclastic_flow'] = {
+		'name': 'Pyroclastic Flow',
+		'desc': 'Lava sold separately.',
+		'effects': ['Grenades spawn tar when they explode', 'Grenade explosions ignite tar', 'Become immune to tar when drifting/dashing'],
+		'type': Enemy.EnemyType.WHEEL,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['shaped_charges'],
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	if not Upgrades.upgrades['shaped_charges'].has('precludes'):
+		Upgrades.upgrades['shaped_charges']['precludes'] = []
+	Upgrades.upgrades['shaped_charges']['precludes'].append('pyroclastic_flow')
+	
 	Upgrades.upgrades['point_defense'] = {
 		'name': 'Point Defense',
 		'desc': 'Bullseye.',
@@ -75,7 +123,7 @@ func _init() -> void:
 		'effects': [''],
 		'type': Enemy.EnemyType.SABER,
 		'tier': 1, 
-		'max_stack': 1,
+		'max_stack': 2,
 		'ai_useable': true,
 		'credits': "Upgrade by BurgerMinus"
 	}
@@ -124,6 +172,7 @@ func _init() -> void:
 		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
 	}
 	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
@@ -131,10 +180,12 @@ func _init() -> void:
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
 	
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/EnergyBall.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/EnergyBall.hooks.gd"))
 	
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Violence.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Violence.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Structs/Attack.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Structs/Attack.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Menus/DiagnosticsMenu.gd"))
 	
