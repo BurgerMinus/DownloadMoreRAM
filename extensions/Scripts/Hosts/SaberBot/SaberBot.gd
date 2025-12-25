@@ -10,4 +10,4 @@ func toggle_enhancement(state):
 	
 	var upgrades_to_apply = get_currently_applicable_upgrades()
 	
-	sword_break = upgrades_to_apply['sword_break']
+	sword_break = upgrades_to_apply['percussive_strike']

@@ -3,8 +3,14 @@ extends Node
 const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 
 var mod_dir_path := ""
-const upgrade_names = ['improvised_nails', 'point_defense', 'static_shock', 'quasar_amplification', 'event_horizon', 'refresh_overclocking']
 var overwrites = []
+const upgrade_names = [
+	'improvised_nails', 
+	'filtration_purge', 
+	'point_defense', 
+	'static_shock', 'quasar_amplification', 'event_horizon', 
+	'refresh_overclocking'
+	]
 
 func _init() -> void:
 	
@@ -21,10 +27,51 @@ func _init() -> void:
 		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['invincible_grenades'] = {
-		'name': 'invincible grenades',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['volume_settings_overclock'] = {
+		'name': 'Volume Settings Overclock',
+		'desc': 'Noise-cancelling headphones recommended.',
+		'effects': ['Performing a Nail Driver greatly boosts the size and power of the Resonance Hammer, but does not fire bullets'],
+		'type': Enemy.EnemyType.SHOTGUN,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': false,
+		'credits': "Concept by Saynin\nIcon and Implementation by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['embedded_vision'] = {
+		'name': 'Embedded Vision',
+		'desc': 'Nanomachines, son.',
+		'effects': ['Bullets home in on nearby targets'],
+		'type': Enemy.EnemyType.SHOTGUN,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['soldering_fingers'],
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	if not Upgrades.upgrades['soldering_fingers'].has('precludes'):
+		Upgrades.upgrades['soldering_fingers']['precludes'] = []
+	Upgrades.upgrades['soldering_fingers']['precludes'].append('embedded_vision')
+	
+	Upgrades.upgrades['flak_shell'] = {
+		'name': 'Flak Shell',
+		'desc': 'No parry required.',
+		'effects': ['Bullets explode on contact with enemies'],
+		'type': Enemy.EnemyType.SHOTGUN,
+		'tier': 2, 
+		'max_stack': 1,
+		'precludes': ['induction_barrel'],
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	if not Upgrades.upgrades['induction_barrel'].has('precludes'):
+		Upgrades.upgrades['induction_barrel']['precludes'] = []
+	Upgrades.upgrades['induction_barrel']['precludes'].append('explosive_bullets')
+	
+	Upgrades.upgrades['phase_shift'] = {
+		'name': 'Phase Shift',
+		'desc': 'Who decided that?',
+		'effects': ['Grenades cannot be deflected or blocked by enemies'],
 		'type': Enemy.EnemyType.WHEEL,
 		'tier': 1, 
 		'max_stack': 1,
@@ -32,10 +79,10 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['dodge_regen'] = {
-		'name': 'dodge regen',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['total_recall'] = {
+		'name': 'Total Recall',
+		'desc': 'Quicker recovery.',
+		'effects': ['Dodging an attack will negate all damage taken in the last second'],
 		'type': Enemy.EnemyType.WHEEL,
 		'tier': 1, 
 		'max_stack': 1,
@@ -69,10 +116,43 @@ func _init() -> void:
 		Upgrades.upgrades['shaped_charges']['precludes'] = []
 	Upgrades.upgrades['shaped_charges']['precludes'].append('pyroclastic_flow')
 	
+	Upgrades.upgrades['underpressure'] = {
+		'name': 'Underpressure',
+		'desc': 'Better out than in.',
+		'effects': ['+50% tar deployment rate', '+50% tar pressure recharge rate'],
+		'type': Enemy.EnemyType.FLAME,
+		'tier': 0, 
+		'max_stack': 3,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['slipstream'] = {
+		'name': 'Slipstream',
+		'desc': 'No, not that Bernoulli.',
+		'effects': ['+100% movement speed on tar', '+50% tar lifetime'],
+		'type': Enemy.EnemyType.FLAME,
+		'tier': 1, 
+		'max_stack': 2,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+	Upgrades.upgrades['filtration_purge'] = {
+		'name': 'Filtration Purge',
+		'desc': 'Unholy hand(?) grenade.',
+		'effects': ['Deploy a chargeable tar bomb that creates a spread of tar puddles'],
+		'type': Enemy.EnemyType.FLAME,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': false,
+		'credits': "Concept and Sprites by cheats_blamesman\nImplementation by BurgerMinus"
+	}
+	
 	Upgrades.upgrades['point_defense'] = {
 		'name': 'Point Defense',
 		'desc': 'Bullseye.',
-		'effects': ['Deflect projectiles towards the cursor with increased speed and damage', 'Overcharge punches up to 150%', '+100% punch charge speed'],
+		'effects': ['Deflect projectiles towards the cursor with increased speed and damage', '+100% punch charge speed'],
 		'type': Enemy.EnemyType.CHAIN,
 		'tier': 1, 
 		'max_stack': 1,
@@ -117,13 +197,13 @@ func _init() -> void:
 		Upgrades.upgrades['beeftank_doctrine']['precludes'] = []
 	Upgrades.upgrades['beeftank_doctrine']['precludes'].append('quasar_amplification')
 	
-	Upgrades.upgrades['sword_break'] = {
-		'name': 'sword break',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['percussive_strike'] = {
+		'name': 'Percussive Strike',
+		'desc': 'Transitional ballistics.',
+		'effects': ['Dislodging a sword with a saber or CWBIDBSC will break it into 3 shards (+2 per stack)'],
 		'type': Enemy.EnemyType.SABER,
 		'tier': 1, 
-		'max_stack': 2,
+		'max_stack': 3,
 		'ai_useable': true,
 		'credits': "Upgrade by BurgerMinus"
 	}
@@ -139,21 +219,21 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['long_stick'] = {
-		'name': 'long stick',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['big_stick'] = {
+		'name': 'Big Stick',
+		'desc': 'The best kind of diplomacy.',
+		'effects': ['+50% paddle size'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 1, 
 		'max_stack': 1,
 		'ai_useable': true,
-		'credits': "Upgrade by BurgerMinus"
+		'credits': "Concept by Cooley\nIcon and Implementation by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['jackhammer'] = {
-		'name': 'jackhammer',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['corium_infusion'] = {
+		'name': 'Corium Infusion',
+		'desc': 'Alternative swing.',
+		'effects': ['Hitting a max-combo orb will fire it as an explosive laser'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
 		'max_stack': 1,
@@ -161,10 +241,10 @@ func _init() -> void:
 		'credits': "Concept by Enneh\nIcon and Implementation by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['vortex'] = {
-		'name': 'vortex',
-		'desc': '',
-		'effects': [''],
+	Upgrades.upgrades['helikon_berra_postulate'] = {
+		'name': 'Helikon-Berra Postulate',
+		'desc': 'Contraverse? What?',
+		'effects': ['Max-combo orbs will create a gravity vortex on impact'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
 		'max_stack': 1,
@@ -172,14 +252,18 @@ func _init() -> void:
 		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
 	}
 	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
 	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ShotgunBot/ShotgunBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ShotgunBot/ShotgunBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
 	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/TarProjectile.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Bullet.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Bullet.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/EnergyBall.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/EnergyBall.hooks.gd"))

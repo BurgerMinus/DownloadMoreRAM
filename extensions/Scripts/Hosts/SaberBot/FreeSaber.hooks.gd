@@ -1,20 +1,9 @@
 extends Object
 
-var sword_break = {}
-
-func anchor_in(chain: ModLoaderHookChain, entity, offset = Vector2.ZERO):
-	
-	var saber = chain.reference_object as FreeSaber
-	
-	chain.execute_next([entity, offset])
-	
-#	if 'sword_break' in saber.causality.source:
-#		sword_break[str(saber)] = saber.causality.source.sword_break
-
 func take_damage(chain: ModLoaderHookChain, attack):
 	
 	var saber = chain.reference_object as FreeSaber
-	var break_sword = saber.anchored# and sword_break[str(saber)]
+	var break_sword = saber.anchored
 	var anchor_entity = saber.anchor_entity
 	
 	var impulse = attack.get_impulse_on(saber)
@@ -46,11 +35,4 @@ func take_damage(chain: ModLoaderHookChain, attack):
 			side_saber.ignored_entities.append(anchor_entity)
 			GameManager.objects_node.add_child(side_saber)
 			Util.set_object_elevation(side_saber, anchor_entity.elevation)
-
-func free_from_anchor(chain: ModLoaderHookChain):
-	
-	var saber = chain.reference_object as FreeSaber
-	
-	chain.execute_next()
-	
-#	sword_break.erase(str(saber))
+		saber.queue_free()

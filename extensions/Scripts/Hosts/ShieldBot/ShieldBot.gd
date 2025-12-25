@@ -2,6 +2,8 @@ extends "res://Scripts/Hosts/ShieldBot/ShieldBot.gd"
 
 const LaserBeamScene := preload("res://Scenes/Violence/LaserBeam.tscn")
 
+var base_shoot_audio_volume = null
+
 var gravity_tackle = false
 var base_base_shield_enemy_repulsion
 var GRAVITY_STRENGTH = 2.5
@@ -24,6 +26,10 @@ var death_ray_turn_speed = 2.0
 
 func toggle_enhancement(state):
 	
+	if base_shoot_audio_volume == null:
+		base_shoot_audio_volume = shoot_audio.volume_db
+	shoot_audio.volume_db = base_shoot_audio_volume
+	
 	static_shock = 0
 	quasar_amplification = false
 	gravity_tackle = false
@@ -34,8 +40,10 @@ func toggle_enhancement(state):
 	var upgrades_to_apply = get_currently_applicable_upgrades()
 	
 	static_shock = upgrades_to_apply['static_shock']
-	quasar_amplification = upgrades_to_apply['quasar_amplification'] > 0 and not beeftank_mode # probably redundant?
 	gravity_tackle = upgrades_to_apply['event_horizon'] > 0
+	quasar_amplification = upgrades_to_apply['quasar_amplification'] > 0 and not beeftank_mode # probably redundant?
+	if quasar_amplification:
+		shoot_audio.volume_db -= 10
 
 func player_action():
 	retaliation_locked = death_ray_charge > 0.0
@@ -146,7 +154,11 @@ func fire_death_ray(delta):
 	death_ray_charge -= delta * dps_mult
 	special_cooldown -= delta * dps_mult * 0.2
 	
+	var volume = shoot_audio.volume_db
+	shoot_audio.volume_db -= 10
 	shoot_audio.play()
+	shoot_audio.volume_db = volume
+	
 	death_rays.append(get_death_ray_beam(params))
 
 # lightly modified version of Violence.shoot_laser(params)

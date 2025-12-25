@@ -16,7 +16,7 @@ func apply_power_mult(chain: ModLoaderHookChain, mult):
 	var epitaph = ball.causality.source
 	
 	if is_instance_valid(epitaph):
-		vortex[ball] = epitaph.get_currently_applicable_upgrades()['vortex'] > 0
+		vortex[ball] = epitaph.get_currently_applicable_upgrades()['helikon_berra_postulate'] > 0
 
 func hit_entity(chain: ModLoaderHookChain, entity):
 	

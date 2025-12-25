@@ -2,6 +2,7 @@ extends Object
 
 var jackhammer = {}
 const jackhammer_delay = 0.35
+const jackhammer_hit_sound = preload("res://Sounds/SoundEffects/Tom/WheelBot/RAM_wheelbotGrenadeImpact.wav")
 
 var GravityVortexScene = null
 
@@ -10,14 +11,13 @@ func toggle_enhancement(chain : ModLoaderHookChain, is_player):
 	var epitaph = chain.reference_object as BatBot
 	
 	epitaph.paddle.scale = Vector2(1, 1)
-	epitaph.paddle_sprite.scale = Vector2(1, 1)
 	
 	chain.execute_next([is_player])
 	
 	var upgrades_to_apply = epitaph.get_currently_applicable_upgrades()
 	
-	epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['long_stick']
-	jackhammer[epitaph] = upgrades_to_apply['jackhammer'] > 0
+	epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['big_stick']
+	jackhammer[epitaph] = upgrades_to_apply['corium_infusion'] > 0
 
 func hit_with_paddle(chain : ModLoaderHookChain, entity):
 	
@@ -53,24 +53,34 @@ func hit_with_paddle(chain : ModLoaderHookChain, entity):
 		for i in range(0, entity.combo):
 			explosion_attack.bonuses.append(Fitness.Bonus.RALLY)
 		
-		fire_jackhammer_laser_delayed(entity, laser, epitaph.get_currently_applicable_upgrades()['vortex'] > 0)
+		fire_jackhammer_laser_delayed(epitaph, entity, laser, epitaph.get_currently_applicable_upgrades()['helikon_berra_postulate'] > 0)
 		
 		if epitaph.was_recently_player():
-			epitaph.bat_strike_audio.play()
 			GameManager.time_manager.duck_timescale('player', 0.001, jackhammer_delay, 100)
 	else:
 		chain.execute_next([entity])
 
-func fire_jackhammer_laser_delayed(ball, params, vortex = false):
+func fire_jackhammer_laser_delayed(epitaph, ball, params, vortex = false):
+	
 	if GravityVortexScene == null:
 		GravityVortexScene = load(ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-DownloadMoreRAM/GravityVortex.tscn"))
 	
 	var combo = ball.combo
 	
+	var hit_audio = AudioStreamPlayer2D.new()
+	hit_audio.stream = jackhammer_hit_sound
+	hit_audio.global_position = ball.global_position
+	hit_audio.volume_db += 10
+	ball.get_tree().current_scene.add_child(hit_audio)
+	hit_audio.connect("finished", Callable(hit_audio, "queue_free"))
+	hit_audio.play()
+	
 	await ball.get_tree().create_timer(jackhammer_delay*0.1).timeout
 	
 	# it is possible for the ball to land and reset its combo during the delay which is bad
 	ball.set_combo(combo)
+	
+	epitaph.bat_strike_audio.play()
 	
 	var ball_recall_position = fire_jackhammer_laser(ball, params, vortex)
 	var epitaph_position = ball.causality.original_source.global_position
@@ -296,7 +306,6 @@ func fire_jackhammer_laser(ball, params, vortex):
 		ball.set_combo(ball.combo + 1)
 	
 	return ball_recall_position
-
 
 func get_auto_aim_target(epitaph, beam_origin, hit_dir):
 	
