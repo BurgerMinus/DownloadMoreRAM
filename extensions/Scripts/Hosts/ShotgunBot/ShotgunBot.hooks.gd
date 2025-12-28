@@ -56,6 +56,5 @@ func shoot(chain: ModLoaderHookChain):
 func reset_values(steeltoe):
 	
 	await steeltoe.get_tree().create_timer(0.5).timeout
-	print("WOOOO")
 	steeltoe.melee_collider.scale = super_melee[steeltoe][1]
 	steeltoe.melee_sprite.scale = super_melee[steeltoe][2]

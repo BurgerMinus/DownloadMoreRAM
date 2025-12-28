@@ -35,6 +35,7 @@ func _ready(chain: ModLoaderHookChain):
 	if is_instance_valid(router):
 		if 'invincible_grenades' in router and router.invincible_grenades:
 			invincible[grenade] = true
+			grenade.add_to_group('ignore_shield')
 		if 'molotov_grenades' in router and router.molotov_grenades:
 			molotov[grenade] = true
 		if 'impact_grenades' in router and router.impact_grenades:

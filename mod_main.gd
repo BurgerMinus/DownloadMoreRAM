@@ -4,8 +4,8 @@ const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 
 var mod_dir_path := ""
 var overwrites = []
-const upgrade_names = [
-	'improvised_nails', 
+var upgrade_names = [
+	'improvised_nails', 'volume_settings_overclock',
 	'filtration_purge', 
 	'point_defense', 
 	'static_shock', 'quasar_amplification', 'event_horizon', 
@@ -38,6 +38,17 @@ func _init() -> void:
 		'credits': "Concept by Saynin\nIcon and Implementation by BurgerMinus"
 	}
 	
+	Upgrades.upgrades['hollow_pointer'] = {
+		'name': 'Hollow Pointer',
+		'desc': 'Even metal will bleed.',
+		'effects': ['Bullets induce non-stacking damage over time'],
+		'type': Enemy.EnemyType.SHOTGUN,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
 	Upgrades.upgrades['embedded_vision'] = {
 		'name': 'Embedded Vision',
 		'desc': 'Nanomachines, son.',
@@ -66,7 +77,7 @@ func _init() -> void:
 	}
 	if not Upgrades.upgrades['induction_barrel'].has('precludes'):
 		Upgrades.upgrades['induction_barrel']['precludes'] = []
-	Upgrades.upgrades['induction_barrel']['precludes'].append('explosive_bullets')
+	Upgrades.upgrades['induction_barrel']['precludes'].append('flak_shell')
 	
 	Upgrades.upgrades['phase_shift'] = {
 		'name': 'Phase Shift',
@@ -160,6 +171,17 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
+	Upgrades.upgrades['repurposed_scrap'] = {
+		'name': 'Repurposed Scrap',
+		'desc': 'Reduce, reuse, recycle.',
+		'effects': ['Killed enemies will drop grappleable scrap'],
+		'type': Enemy.EnemyType.CHAIN,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': true,
+		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+	}
+	
 	Upgrades.upgrades['static_shock'] = {
 		'name': 'Static Shock',
 		'desc': 'First, maybe do a little harm.',
@@ -208,6 +230,28 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
+	Upgrades.upgrades['inner_peace'] = {
+		'name': 'Inner Peace',
+		'desc': 'The eight winds cannot move you.',
+		'effects': ['Remain in KILL MODE until slashing or manually cancelling', 'Special cooldown is not reset if KILL MODE is manually cancelled'],
+		'type': Enemy.EnemyType.SABER,
+		'tier': 2, 
+		'max_stack': 1,
+		'ai_useable': false,
+		'credits': "Upgrade by BurgerMinus"
+	}
+	
+#	Upgrades.upgrades['lightning_rod'] = {
+#		'name': 'Lightning Rod',
+#		'desc': '',
+#		'effects': ['Hitting an enemy with CWBIDBSC will spawn a delayed AOE lightning strike'],
+#		'type': Enemy.EnemyType.SABER,
+#		'tier': 2, 
+#		'max_stack': 1,
+#		'ai_useable': false,
+#		'credits': "Concept by CampfireCollective\nIcon and Implementation by BurgerMinus"
+#	}
+	
 	Upgrades.upgrades['refresh_overclocking'] = {
 		'name': 'Refresh Overclocking',
 		'desc': 'CBF activated.',
@@ -252,17 +296,48 @@ func _init() -> void:
 		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
 	}
 	
+	Upgrades.GOLEM_upgrades['mimesis'] = {
+		'name': 'Mimesis',
+		'desc': 'Loving memories / Persistent nightmares.',
+		'effects': ['Post-swap residual control lasts 3x as long', 'Enemies permanently retain your upgrades when swapping out'],
+		'max_stack': 1,
+		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+	}
+	
+	Upgrades.GOLEM_upgrades['temerity'] = {
+		'name': 'Temerity',
+		'desc': 'Short/sweet.',
+		'effects': ['Gain temporary invincibility upon swapping', 'Host health set to 1 when invincibility expires'],
+		'max_stack': 1,
+		'precludes': ['caution'],
+		'credits': "Upgrade by BurgerMinus"
+	}
+	if not Upgrades.GOLEM_upgrades['caution'].has('precludes'):
+		Upgrades.GOLEM_upgrades['caution']['precludes'] = []
+	Upgrades.GOLEM_upgrades['caution']['precludes'].append('temerity')
+	
+#	Upgrades.GOLEM_upgrades['desperation'] = {
+#		'name': 'Desperation',
+#		'desc': '',
+#		'effects': ['MITE is invincible for 3 seconds upon ejection', '3x MITE energy drain when damaged / over time'],
+#		'max_stack': 1,
+#		'credits': "Concept by AquaTail\nIcon and Implementation by BurgerMinus"
+#	}
+	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
 	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Enemy.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Enemy.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ShotgunBot/ShotgunBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ShotgunBot/ShotgunBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
 	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/Grapple.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/TarProjectile.gd"))
+	
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Bullet.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Bullet.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
@@ -280,6 +355,8 @@ func _init() -> void:
 	
 	for upgrade in upgrade_names:
 		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
+		if icon == null:
+			icon = load(mod_dir_path.path_join("icons/placeholder_icon.png"))
 		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
 		overwrites.append(icon)
 	

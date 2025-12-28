@@ -1,6 +1,7 @@
 extends Object
 
 var homing_target = {}
+const burn_dot_tag = 17342
 
 func _ready(chain: ModLoaderHookChain):
 	
@@ -14,14 +15,17 @@ func _ready(chain: ModLoaderHookChain):
 		
 		var explosive = false
 		var homing = false
+		var burn = false
 		
 		if source is ShotgunBot:
 			var upgrades_to_apply = source.get_currently_applicable_upgrades() 
 			explosive = upgrades_to_apply['flak_shell'] > 0
 			homing = upgrades_to_apply['embedded_vision'] > 0
+			burn = upgrades_to_apply['hollow_pointer'] > 0
 		elif source is FlakBullet:
 			homing = homing_target.has(source)
 			explosive = source.explosion_size > 0
+			burn = source.is_in_group('dmr_burn_dot')
 		
 		if homing:
 			homing_target[bullet] = [null, 0.1]
@@ -29,6 +33,8 @@ func _ready(chain: ModLoaderHookChain):
 			bullet.explosion_damage = bullet.damage * 0.5
 			bullet.explosion_kb = bullet.damage * 10
 			bullet.explosion_size = min(bullet.damage, 15) * 0.075
+		if burn:
+			bullet.add_to_group('dmr_burn_dot')
 
 func _physics_process(chain: ModLoaderHookChain, delta):
 	
@@ -36,8 +42,6 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	for bullet in homing_target.keys():
 		if not is_instance_valid(bullet):
 			homing_target.erase(bullet)
-	
-	print(homing_target.keys().size())
 	
 	var bullet = chain.reference_object as Bullet
 	
@@ -49,6 +53,17 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 		homing_target[bullet][1] -= delta
 		if homing_target[bullet][0] != null:
 			home_to_target(bullet, delta)
+
+func get_attack(chain: ModLoaderHookChain):
+	
+	var bullet = chain.reference_object as Bullet
+	
+	var attack = chain.execute_next()
+	
+	if bullet.is_in_group('dmr_burn_dot'):
+		attack.add_tag(burn_dot_tag)
+	
+	return attack
 
 func on_pierce(chain: ModLoaderHookChain):
 	

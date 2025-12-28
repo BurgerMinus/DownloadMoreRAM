@@ -61,10 +61,8 @@ func _physics_process(delta):
 	
 	for i in range(0, nearby_projectiles.size()):
 		var p = nearby_projectiles[i]
-		if p is Grenade:
-			var s = p.causality.original_source
-			if 'invincible_grenades' in s and s.invincible_grenades:
-				nearby_projectiles[i] = null
+		if is_instance_valid(p) and p.is_in_group('ignore_shield'):
+			nearby_projectiles[i] = null
 	
 	super(delta)
 	
@@ -337,6 +335,8 @@ func inflict_shield_attack():
 		shield_attack.inflict_on(e)
 
 func start_tackle():
+	if retaliating and retaliation_locked:
+		return
 	super()
 	if gravity_tackle:
 		shield_attack_cooldown = 0.05

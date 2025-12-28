@@ -1,0 +1,66 @@
+[gd_scene load_steps=8 format=3 uid="uid://cjgxryfdet82x"]
+
+[ext_resource type="Script" path="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/Scrap.gd" id="1_tmagd"]
+[ext_resource type="Texture2D" uid="uid://bwh8hwqgtjsc4" path="res://Art/Characters/Level1Boss/rubbles1.png" id="2_he4w6"]
+[ext_resource type="Texture2D" uid="uid://dmnd26dovd14t" path="res://Art/Particles/BreakingPuff.png" id="3_04usd"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0glbf"]
+radius = 3.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_f5hc1"]
+radius = 9.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_2rbmo"]
+particles_animation = true
+particles_anim_h_frames = 6
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_5yxeg"]
+colors = PackedColorArray(0.0315443, 0.174039, 0.242188, 1, 1, 1, 1, 1)
+
+[node name="BoulderActor" type="CharacterBody2D" groups=["grappleable"]]
+collision_mask = 0
+script = ExtResource("1_tmagd")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_0glbf")
+
+[node name="Hitbox" type="Area2D" parent="." groups=["hitbox"]]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_f5hc1")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+modulate = Color(0.705882, 0.705882, 0.705882, 1)
+position = Vector2(0, -2)
+scale = Vector2(1, 0.982)
+texture = ExtResource("2_he4w6")
+
+[node name="SmashParticles" type="CPUParticles2D" parent="."]
+z_index = 79
+material = SubResource("CanvasItemMaterial_2rbmo")
+rotation = -1.5708
+emitting = false
+amount = 10
+lifetime = 0.4
+one_shot = true
+explosiveness = 0.7
+texture = ExtResource("3_04usd")
+emission_shape = 3
+emission_rect_extents = Vector2(10, 10)
+spread = 37.16
+initial_velocity_max = 200.36
+linear_accel_min = -100.0
+linear_accel_max = 78.71
+radial_accel_min = -57.43
+radial_accel_max = 18.06
+tangential_accel_min = -18.01
+tangential_accel_max = 89.03
+scale_amount_min = 0.3
+color = Color(0.447059, 0.447059, 0.447059, 1)
+color_ramp = SubResource("Gradient_5yxeg")
+anim_speed_min = 1.0
+anim_speed_max = 1.0
