@@ -68,6 +68,22 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	chain.execute_next([delta])
 	
 	enemy.time_since_swap = temp
+	
+	if past_hosts.has(enemy):
+		past_hosts[enemy] -= delta
+		if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host and past_hosts[enemy] < 0.0:
+			enemy.health = min(enemy.health, 1)
+	
+	if burn_dot.has(enemy):
+		if burn_dot[enemy][0] > 0.0:
+			burn_dot[enemy][0] -= delta
+			burn_dot[enemy][1] -= delta
+			if burn_dot[enemy][1] < 0.0:
+				burn_dot[enemy][1] = burn_dot_tick_duration
+				var burn_dot_attack = Attack.new(enemy, burn_dot_dps * burn_dot_tick_duration)
+				burn_dot_attack.bonuses.append(Fitness.Bonus.VANILLA)
+				burn_dot_attack.hit_allies = true
+				burn_dot_attack.inflict_on(enemy)
 
 func take_damage(chain: ModLoaderHookChain, attack):
 	
@@ -81,28 +97,6 @@ func take_damage(chain: ModLoaderHookChain, attack):
 		else:
 			burn_dot[enemy] = [burn_dot_duration, burn_dot_tick_duration]
 
-func misc_update(chain: ModLoaderHookChain, _delta):
-	
-	var enemy = chain.reference_object as Enemy
-	
-	chain.execute_next([_delta])
-	
-	if past_hosts.has(enemy):
-		past_hosts[enemy] -= _delta
-		if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host and past_hosts[enemy] < 0.0:
-			enemy.health = min(enemy.health, 1)
-	
-	if burn_dot.has(enemy):
-		if burn_dot[enemy][0] > 0.0:
-			burn_dot[enemy][0] -= _delta
-			burn_dot[enemy][1] -= _delta
-			if burn_dot[enemy][1] < 0.0:
-				burn_dot[enemy][1] = burn_dot_tick_duration
-				var burn_dot_attack = Attack.new(enemy, burn_dot_dps * burn_dot_tick_duration)
-				burn_dot_attack.bonuses.append(Fitness.Bonus.VANILLA)
-				burn_dot_attack.hit_allies = true
-				burn_dot_attack.inflict_on(enemy)
-
 func die(chain: ModLoaderHookChain, attack):
 	
 	var enemy = chain.reference_object as Enemy
@@ -111,6 +105,8 @@ func die(chain: ModLoaderHookChain, attack):
 	
 	past_hosts.erase(enemy)
 	burn_dot.erase(enemy)
+	
+	if not is_instance_valid(attack): return
 	
 	var killer = attack.causality.original_source
 	if is_instance_valid(killer) and killer is ChainBot and killer.get_currently_applicable_upgrades()['repurposed_scrap'] > 0:

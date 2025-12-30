@@ -10,7 +10,7 @@ func toggle_enhancement(chain : ModLoaderHookChain, is_player):
 	
 	var upgrades_to_apply = steeltoe.get_currently_applicable_upgrades()
 	
-	super_melee[steeltoe] = [upgrades_to_apply['volume_settings_overclock'], steeltoe.melee_collider.scale, steeltoe.melee_sprite.scale]
+	super_melee[steeltoe] = [false]#[upgrades_to_apply['volume_settings_overclock'] > 0, steeltoe.melee_collider.scale, steeltoe.melee_sprite.scale]
 
 func die(chain: ModLoaderHookChain, attack = null):
 	
@@ -35,7 +35,7 @@ func shoot(chain: ModLoaderHookChain):
 		steeltoe.melee_sprite.scale *= 2.0
 		
 		var count = 4
-		if steeltoe.melee_charge_timer - 0.0001 > 0.0:
+		if steeltoe.melee_charge_timer - 0.0001 > 0.0: # determine if attack has already happened
 			count += 1
 		
 		for i in range(0, count):

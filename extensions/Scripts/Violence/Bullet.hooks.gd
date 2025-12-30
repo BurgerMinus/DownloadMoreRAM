@@ -48,6 +48,7 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	chain.execute_next([delta])
 	
 	if homing_target.has(bullet):
+		bullet.bullet_distance -= 0.33 * delta * bullet.speed # extends bullet lifetime by ~50%
 		if homing_target[bullet] == null or homing_target[bullet][1] < 0:
 			update_homing_target(bullet)
 		homing_target[bullet][1] -= delta

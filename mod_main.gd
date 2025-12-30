@@ -5,12 +5,17 @@ const MOD_DIR := "BurgerMinus-DownloadMoreRAM"
 var mod_dir_path := ""
 var overwrites = []
 var upgrade_names = [
-	'improvised_nails', 'volume_settings_overclock',
-	'filtration_purge', 
-	'point_defense', 
+	'improvised_nails', 'volume_settings_overclock', 'hollow_pointer', 'embedded_vision', 'flak_shell',
+	'phase_shift', 'total_recall', 'flash_flame', 'pyroclastic_flow',
+	'underpressure', 'slipstream', 'filtration_purge', 
+	'point_defense', 'repurposed_scrap',
 	'static_shock', 'quasar_amplification', 'event_horizon', 
-	'refresh_overclocking'
+	'percussive_strike', 'medium_maximization',
+	'refresh_overclocking',
+	'big_stick', 'helikon_berra_postulate', 'corium_infusion'
 	]
+
+var golem_upgrade_names = ['mimesis', 'temerity', 'bloodlust']
 
 func _init() -> void:
 	
@@ -27,16 +32,16 @@ func _init() -> void:
 		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['volume_settings_overclock'] = {
-		'name': 'Volume Settings Overclock',
-		'desc': 'Noise-cancelling headphones recommended.',
-		'effects': ['Performing a Nail Driver greatly boosts the size and power of the Resonance Hammer, but does not fire bullets'],
-		'type': Enemy.EnemyType.SHOTGUN,
-		'tier': 2, 
-		'max_stack': 1,
-		'ai_useable': false,
-		'credits': "Concept by Saynin\nIcon and Implementation by BurgerMinus"
-	}
+#	Upgrades.upgrades['volume_settings_overclock'] = {
+#		'name': 'Volume Settings Overclock',
+#		'desc': 'Noise-cancelling headphones recommended.',
+#		'effects': ['Performing a Nail Driver greatly boosts the size and power of the Resonance Hammer, but does not fire bullets'],
+#		'type': Enemy.EnemyType.SHOTGUN,
+#		'tier': 2, 
+#		'max_stack': 1,
+#		'ai_useable': false,
+#		'credits': "Concept by Saynin\nImplementation by BurgerMinus"
+#	}
 	
 	Upgrades.upgrades['hollow_pointer'] = {
 		'name': 'Hollow Pointer',
@@ -179,13 +184,13 @@ func _init() -> void:
 		'tier': 2, 
 		'max_stack': 1,
 		'ai_useable': true,
-		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+		'credits': "Concept by Gwonam\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['static_shock'] = {
 		'name': 'Static Shock',
 		'desc': 'First, maybe do a little harm.',
-		'effects': ['Damage and stun enemies within your shield (+100% shock rate per stack)'],
+		'effects': ['Damage and stun enemies within your shield (+100% shock rate per stack)', 'Shock attack will sometimes break off and capture scrap'],
 		'type': Enemy.EnemyType.SHIELD,
 		'tier': 1, 
 		'max_stack': 2,
@@ -230,12 +235,12 @@ func _init() -> void:
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
-	Upgrades.upgrades['inner_peace'] = {
-		'name': 'Inner Peace',
+	Upgrades.upgrades['medium_maximization'] = {
+		'name': 'Medium Maximization',
 		'desc': 'The eight winds cannot move you.',
-		'effects': ['Remain in KILL MODE until slashing or manually cancelling', 'Special cooldown is not reset if KILL MODE is manually cancelled'],
+		'effects': ['Remain in KILL MODE until slashing or manually cancelling', 'Manually cancelling KILL MODE completely resets special cooldown'],
 		'type': Enemy.EnemyType.SABER,
-		'tier': 2, 
+		'tier': 1, 
 		'max_stack': 1,
 		'ai_useable': false,
 		'credits': "Upgrade by BurgerMinus"
@@ -249,7 +254,7 @@ func _init() -> void:
 #		'tier': 2, 
 #		'max_stack': 1,
 #		'ai_useable': false,
-#		'credits': "Concept by CampfireCollective\nIcon and Implementation by BurgerMinus"
+#		'credits': "Concept by CampfireCollective\nImplementation by BurgerMinus"
 #	}
 	
 	Upgrades.upgrades['refresh_overclocking'] = {
@@ -271,7 +276,7 @@ func _init() -> void:
 		'tier': 1, 
 		'max_stack': 1,
 		'ai_useable': true,
-		'credits': "Concept by Cooley\nIcon and Implementation by BurgerMinus"
+		'credits': "Concept by Cooley\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['corium_infusion'] = {
@@ -282,7 +287,7 @@ func _init() -> void:
 		'tier': 2, 
 		'max_stack': 1,
 		'ai_useable': false,
-		'credits': "Concept by Enneh\nIcon and Implementation by BurgerMinus"
+		'credits': "Concept by Enneh\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['helikon_berra_postulate'] = {
@@ -293,7 +298,7 @@ func _init() -> void:
 		'tier': 2, 
 		'max_stack': 1,
 		'ai_useable': false,
-		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+		'credits': "Concept by Gwonam\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.GOLEM_upgrades['mimesis'] = {
@@ -301,7 +306,7 @@ func _init() -> void:
 		'desc': 'Loving memories / Persistent nightmares.',
 		'effects': ['Post-swap residual control lasts 3x as long', 'Enemies permanently retain your upgrades when swapping out'],
 		'max_stack': 1,
-		'credits': "Concept by Gwonam\nIcon and Implementation by BurgerMinus"
+		'credits': "Concept by Gwonam\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.GOLEM_upgrades['temerity'] = {
@@ -316,12 +321,20 @@ func _init() -> void:
 		Upgrades.GOLEM_upgrades['caution']['precludes'] = []
 	Upgrades.GOLEM_upgrades['caution']['precludes'].append('temerity')
 	
+	Upgrades.GOLEM_upgrades['bloodlust'] = {
+		'name': 'Bloodlust',
+		'desc': 'Hit/Miss the mark.',
+		'effects': ['Instead of spending energy, drain 150% energy over time', 'Get a kill to cancel drain', 'Swapping while energy drain is active costs the normal amount'],
+		'max_stack': 1,
+		'credits': "Concept by cheats_blamesman\nImplementation by BurgerMinus"
+	}
+	
 #	Upgrades.GOLEM_upgrades['desperation'] = {
 #		'name': 'Desperation',
 #		'desc': '',
 #		'effects': ['MITE is invincible for 3 seconds upon ejection', '3x MITE energy drain when damaged / over time'],
 #		'max_stack': 1,
-#		'credits': "Concept by AquaTail\nIcon and Implementation by BurgerMinus"
+#		'credits': "Concept by AquaTail\nImplementation by BurgerMinus"
 #	}
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
@@ -347,6 +360,7 @@ func _init() -> void:
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Structs/Attack.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Structs/Attack.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Menus/DiagnosticsMenu.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Player/SwapManager.gd", mod_dir_path.path_join("extensions/Scripts/Player/SwapManager.hooks.gd"))
 	
 	# completely cosmetic change, allows event horizon effect to display properly
 	var shield = load(mod_dir_path.path_join("Circle_234.png"))
@@ -357,6 +371,13 @@ func _init() -> void:
 		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
 		if icon == null:
 			icon = load(mod_dir_path.path_join("icons/placeholder_icon.png"))
+		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
+		overwrites.append(icon)
+	
+	for upgrade in golem_upgrade_names:
+		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
+		if icon == null:
+			icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
 		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
 		overwrites.append(icon)
 	

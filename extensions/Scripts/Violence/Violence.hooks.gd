@@ -29,5 +29,6 @@ static func melee_attack(chain: ModLoaderHookChain, collider, attack):
 				var angle = source.global_position.direction_to(entity.global_position).rotated(0.35*PI*(randf() - 0.5)).normalized()
 				var bullet = Violence.shoot_bullet(source, entity.global_position, angle*source.shot_speed, source.bullet_damage)
 				bullet.ignored.append(entity)
+				bullet.set_appearance(source.bullet_type)
 	
 	return hit_entities

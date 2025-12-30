@@ -9,10 +9,12 @@ var base_base_shield_enemy_repulsion
 var GRAVITY_STRENGTH = 2.5
 
 var static_shock = 0
+const max_shield_attack_cooldown = 0.25
 var shield_attack_cooldown = 0.25
 var shield_attack_timer = 0.0
 var shield_attack_damage = 2.5
 var shield_attack_stun = 0.1
+var base_shield_attack_stun = 0.1
 
 var quasar_amplification = false
 var death_rays = []
@@ -333,14 +335,17 @@ func inflict_shield_attack():
 	for e in nearby_enemies:
 		if not is_in_shield_AOE(e.global_position) or (e.was_recently_player() == was_recently_player()): continue
 		shield_attack.inflict_on(e)
+		if randf() < max_shield_attack_cooldown:
+			generate_captured_bullets(1, e.global_position)
 
 func start_tackle():
 	if retaliating and retaliation_locked:
 		return
 	super()
 	if gravity_tackle:
-		shield_attack_cooldown = 0.05
-		shield_attack_stun = 0.5
+		shield_attack_timer *= 0.2
+		shield_attack_cooldown = 0.2*max_shield_attack_cooldown
+		shield_attack_stun = 5*base_shield_attack_stun
 		base_shield_enemy_repulsion = -base_base_shield_enemy_repulsion * GRAVITY_STRENGTH
 		set_shield_width(2*PI)
 		set_shield_color(Vector3(0.33, 0, 0.5))
@@ -349,8 +354,8 @@ func start_tackle():
 func end_tackle():
 	super()
 	# reset event horizon effects
-	shield_attack_cooldown = 0.25
-	shield_attack_stun = 0.1
+	shield_attack_cooldown = max_shield_attack_cooldown
+	shield_attack_stun = base_shield_attack_stun
 	base_shield_enemy_repulsion = base_base_shield_enemy_repulsion
 	update_overburden_penalties() # reset shield width and color
 
