@@ -4,6 +4,8 @@ extends Object
 # value of the entry is the temerity invincibilty timer
 var past_hosts = {}
 
+var repurposed_scrap = {}
+
 var burn_dot = {}
 var burn_dot_duration = 5.0
 var burn_dot_tick_duration = 0.5
@@ -110,8 +112,18 @@ func die(chain: ModLoaderHookChain, attack):
 	
 	var killer = attack.causality.original_source
 	if is_instance_valid(killer) and killer is ChainBot and killer.get_currently_applicable_upgrades()['repurposed_scrap'] > 0:
-		for i in range(0, 3 if enemy is Boss else 1):
+		repurposed_scrap[enemy] = 3 if enemy is Boss else 1
+
+func actually_die(chain: ModLoaderHookChain):
+	
+	var enemy = chain.reference_object as Enemy
+	
+	if repurposed_scrap.has(enemy) and not enemy.actually_dead:
+		for i in range(0, repurposed_scrap[enemy]):
 			spawn_scrap(enemy)
+		repurposed_scrap.erase(enemy)
+	
+	chain.execute_next()
 
 func spawn_scrap(enemy):
 	
@@ -134,3 +146,5 @@ func spawn_scrap(enemy):
 	enemy.get_parent().add_child(scrap)
 	scrap.global_position = enemy.global_position
 	Util.set_object_elevation(scrap, enemy.elevation)
+	
+	return scrap

@@ -47,6 +47,10 @@ func _physics_process(delta):
 	if lifetime < 0.0:
 		die(null)
 
+func take_damage(attack):
+	attack.damage *= 0.5
+	super(attack)
+
 func set_type(type):
 	enemy_type = type
 	if not is_instance_valid(sprite):

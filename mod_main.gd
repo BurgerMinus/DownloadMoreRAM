@@ -32,6 +32,7 @@ func _init() -> void:
 		'credits': "Concept and Icon by Lettuce\nImplementation by BurgerMinus"
 	}
 	
+# saynin did not give perms yet
 #	Upgrades.upgrades['volume_settings_overclock'] = {
 #		'name': 'Volume Settings Overclock',
 #		'desc': 'Noise-cancelling headphones recommended.',
@@ -44,8 +45,8 @@ func _init() -> void:
 #	}
 	
 	Upgrades.upgrades['hollow_pointer'] = {
-		'name': 'Hollow Pointer',
-		'desc': 'Even metal will bleed.',
+		'name': 'Hollow Pointer', # haha you get it bc pointers and robots haha get it
+		'desc': 'Even metal will bleed.', # gabriel ultrakill
 		'effects': ['Bullets induce non-stacking damage over time'],
 		'type': Enemy.EnemyType.SHOTGUN,
 		'tier': 2, 
@@ -56,7 +57,7 @@ func _init() -> void:
 	
 	Upgrades.upgrades['embedded_vision'] = {
 		'name': 'Embedded Vision',
-		'desc': 'Nanomachines, son.',
+		'desc': 'Nanomachines, son.', # nice argument senator
 		'effects': ['Bullets home in on nearby targets'],
 		'type': Enemy.EnemyType.SHOTGUN,
 		'tier': 2, 
@@ -70,8 +71,8 @@ func _init() -> void:
 	Upgrades.upgrades['soldering_fingers']['precludes'].append('embedded_vision')
 	
 	Upgrades.upgrades['flak_shell'] = {
-		'name': 'Flak Shell',
-		'desc': 'No parry required.',
+		'name': 'Flak Shell', # astroflux reference
+		'desc': 'No parry required.', # roundabout ultrakill reference
 		'effects': ['Bullets explode on contact with enemies'],
 		'type': Enemy.EnemyType.SHOTGUN,
 		'tier': 2, 
@@ -86,7 +87,7 @@ func _init() -> void:
 	
 	Upgrades.upgrades['phase_shift'] = {
 		'name': 'Phase Shift',
-		'desc': 'Who decided that?',
+		'desc': 'Who decided that?', # escanor
 		'effects': ['Grenades cannot be deflected or blocked by enemies'],
 		'type': Enemy.EnemyType.WHEEL,
 		'tier': 1, 
@@ -96,19 +97,19 @@ func _init() -> void:
 	}
 	
 	Upgrades.upgrades['total_recall'] = {
-		'name': 'Total Recall',
-		'desc': 'Quicker recovery.',
-		'effects': ['Dodging an attack will negate all damage taken in the last second'],
+		'name': 'Total Recall', # funnily enough not a tracer reference
+		'desc': 'Quicker recovery.', # hades reference
+		'effects': ['Dodging an attack will negate all damage taken in the last second', '-80% dash cooldown'],
 		'type': Enemy.EnemyType.WHEEL,
-		'tier': 1, 
+		'tier': 2, 
 		'max_stack': 1,
 		'ai_useable': true,
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['flash_flame'] = {
-		'name': 'Flash Flame',
-		'desc': 'External payload(s).',
+		'name': 'Flash Flame', # aye itll be out in a jiffy
+		'desc': 'External payload(s).', # doom 2016 remote det upgrade
 		'effects': ['Grenades create a miniature explosion on hit'],
 		'type': Enemy.EnemyType.WHEEL,
 		'tier': 2, 
@@ -134,7 +135,7 @@ func _init() -> void:
 	
 	Upgrades.upgrades['underpressure'] = {
 		'name': 'Underpressure',
-		'desc': 'Better out than in.',
+		'desc': 'Better out than in.', # shrek?
 		'effects': ['+50% tar deployment rate', '+50% tar pressure recharge rate'],
 		'type': Enemy.EnemyType.FLAME,
 		'tier': 0, 
@@ -145,8 +146,8 @@ func _init() -> void:
 	
 	Upgrades.upgrades['slipstream'] = {
 		'name': 'Slipstream',
-		'desc': 'No, not that Bernoulli.',
-		'effects': ['+100% movement speed on tar', '+50% tar lifetime'],
+		'desc': 'No, not that Bernoulli.', 
+		'effects': ['+75% movement speed on tar', '+50% tar lifetime'],
 		'type': Enemy.EnemyType.FLAME,
 		'tier': 1, 
 		'max_stack': 2,
@@ -161,14 +162,14 @@ func _init() -> void:
 		'type': Enemy.EnemyType.FLAME,
 		'tier': 2, 
 		'max_stack': 1,
-		'ai_useable': false,
+		'ai_useable': true,
 		'credits': "Concept and Sprites by cheats_blamesman\nImplementation by BurgerMinus"
 	}
 	
 	Upgrades.upgrades['point_defense'] = {
 		'name': 'Point Defense',
 		'desc': 'Bullseye.',
-		'effects': ['Deflect projectiles towards the cursor with increased speed and damage', '+100% punch charge speed'],
+		'effects': ['Deflect projectiles towards the cursor with increased speed and damage', '+100% punch charge speed', 'Punches can deflect lasers (CURRENTLY UNIMPLEMENTED BC I HAVENT FIGURED OUT HOW YET)'],
 		'type': Enemy.EnemyType.CHAIN,
 		'tier': 1, 
 		'max_stack': 1,
@@ -201,7 +202,7 @@ func _init() -> void:
 	Upgrades.upgrades['event_horizon'] = {
 		'name': 'Event Horizon',
 		'desc': 'Universal gravitation.',
-		'effects': ['Tackles create a gravity well that pulls in enemies, absorbs lasers (boosting the damage of all collected projectiles), and instantly captures projectiles', 'With Static Shock: 5x shock rate and shock stun duration while tackling'],
+		'effects': ['Tackles create a gravity well that pulls in enemies, absorbs lasers, and instantly captures projectiles', 'With Static Shock: 5x shock rate and shock stun duration while tackling'],
 		'type': Enemy.EnemyType.SHIELD,
 		'tier': 2, 
 		'max_stack': 1,
@@ -236,16 +237,17 @@ func _init() -> void:
 	}
 	
 	Upgrades.upgrades['medium_maximization'] = {
-		'name': 'Medium Maximization',
-		'desc': 'The eight winds cannot move you.',
+		'name': 'Medium Maximization', # the propensity to pursue the means by which a desired outcome is achieved rather than the outcome itself
+		'desc': 'The eight winds cannot move you.', # that one chinese guy
 		'effects': ['Remain in KILL MODE until slashing or manually cancelling', 'Manually cancelling KILL MODE completely resets special cooldown'],
 		'type': Enemy.EnemyType.SABER,
-		'tier': 1, 
+		'tier': 2, 
 		'max_stack': 1,
-		'ai_useable': false,
+		'ai_useable': true,
 		'credits': "Upgrade by BurgerMinus"
 	}
 	
+# havent figured out how to balance this in a satisfying way
 #	Upgrades.upgrades['lightning_rod'] = {
 #		'name': 'Lightning Rod',
 #		'desc': '',
@@ -258,8 +260,8 @@ func _init() -> void:
 #	}
 	
 	Upgrades.upgrades['refresh_overclocking'] = {
-		'name': 'Refresh Overclocking',
-		'desc': 'CBF activated.',
+		'name': 'Refresh Overclocking', 
+		'desc': 'CBF activated.', # gd click between frames
 		'effects': ['Fire up to 4 more suspended lasers during bomb boost', '+66% bomb boost duration'],
 		'type': Enemy.EnemyType.ARCHER,
 		'tier': 2, 
@@ -270,7 +272,7 @@ func _init() -> void:
 	
 	Upgrades.upgrades['big_stick'] = {
 		'name': 'Big Stick',
-		'desc': 'The best kind of diplomacy.',
+		'desc': 'The best kind of diplomacy.', # teddy roosevelt
 		'effects': ['+50% paddle size'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 1, 
@@ -281,7 +283,7 @@ func _init() -> void:
 	
 	Upgrades.upgrades['corium_infusion'] = {
 		'name': 'Corium Infusion',
-		'desc': 'Alternative swing.',
+		'desc': 'Alternative swing.', # ultrakill alt shotgun joke
 		'effects': ['Hitting a max-combo orb will fire it as an explosive laser'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
@@ -291,8 +293,8 @@ func _init() -> void:
 	}
 	
 	Upgrades.upgrades['helikon_berra_postulate'] = {
-		'name': 'Helikon-Berra Postulate',
-		'desc': 'Contraverse? What?',
+		'name': 'Helikon-Berra Postulate', # yogi berra + helikon vortex separation process
+		'desc': 'Contraverse? What?', # contraverse holds
 		'effects': ['Max-combo orbs will create a gravity vortex on impact'],
 		'type': Enemy.EnemyType.BAT,
 		'tier': 2, 
@@ -329,6 +331,7 @@ func _init() -> void:
 		'credits': "Concept by cheats_blamesman\nImplementation by BurgerMinus"
 	}
 	
+# havent figured out how to design this yet
 #	Upgrades.GOLEM_upgrades['desperation'] = {
 #		'name': 'Desperation',
 #		'desc': '',
@@ -349,8 +352,6 @@ func _init() -> void:
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/Grapple.gd"))
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/TarProjectile.gd"))
-	
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Bullet.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Bullet.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))

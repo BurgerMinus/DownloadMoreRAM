@@ -1,5 +1,7 @@
 extends Object
 
+var big_stick = {}
+
 var jackhammer = {}
 const jackhammer_delay = 0.35
 const jackhammer_hit_sound = preload("res://Sounds/SoundEffects/Tom/WheelBot/RAM_wheelbotGrenadeImpact.wav")
@@ -11,15 +13,32 @@ func toggle_enhancement(chain : ModLoaderHookChain, is_player):
 	var epitaph = chain.reference_object as BatBot
 	
 	epitaph.paddle.scale = Vector2(1, 1)
+	epitaph.paddle_max_vel = 5*PI
 	
 	chain.execute_next([is_player])
 	
 	var upgrades_to_apply = epitaph.get_currently_applicable_upgrades()
 	
-	epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['big_stick']
+	if upgrades_to_apply['big_stick'] > 0:
+		epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['big_stick']
+		epitaph.paddle_max_vel *= 1.5#1.0 + 0.5*upgrades_to_apply['big_stick']
+		big_stick[epitaph] = true
+	
 	jackhammer[epitaph] = upgrades_to_apply['corium_infusion'] > 0
 
-func hit_with_paddle(chain : ModLoaderHookChain, entity):
+func start_swing(chain: ModLoaderHookChain, lunge_dir = Vector2.ZERO):
+	
+	var epitaph = chain.reference_object as BatBot
+	
+	if lunge_dir == Vector2.ZERO:
+		lunge_dir = epitaph.get_movement_input_vector().normalized()
+	
+	chain.execute_next([lunge_dir])
+	
+	if big_stick.has(epitaph):
+		epitaph.paddle_accel *= 1.75#1.0 + 0.5*big_stick[epitaph]
+
+func hit_with_paddle(chain: ModLoaderHookChain, entity):
 	
 	var epitaph = chain.reference_object as BatBot
 	
@@ -347,3 +366,4 @@ func die(chain: ModLoaderHookChain, attack = null):
 	chain.execute_next([attack])
 	
 	jackhammer.erase(epitaph)
+	big_stick.erase(epitaph)

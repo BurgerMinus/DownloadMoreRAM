@@ -22,6 +22,8 @@ func toggle_enhancement(state):
 	impact_grenades = upgrades_to_apply['flash_flame'] > 0
 	invincible_grenades = upgrades_to_apply['phase_shift'] > 0
 	dodge_regen = upgrades_to_apply['total_recall'] > 0
+	if dodge_regen:
+		max_special_cooldown *= 0.2
 
 func begin_charging_dash():
 	super()

@@ -69,20 +69,22 @@ func _physics_process(delta):
 	super(delta)
 	
 	if quasar_amplification:
-		if retaliating or death_ray_charge > 0.0:
+		if is_player:
 			retaliation_target_point = get_global_mouse_position()
+		if death_ray_charge > 0.0:
 			var angle_diff = Vector2.RIGHT.rotated(death_ray_angle).angle_to(global_position.direction_to(retaliation_target_point))
 			var turn_speed = death_ray_turn_speed * deg_to_rad(sign(angle_diff)) * (min(bullet_orbit_speed, 33.0) / 6.0)
 			death_ray_angle += sign(angle_diff) * min(abs(turn_speed), abs(deg_to_rad(angle_diff)))
-			if quasar_amplification and death_ray_charge > 0.0:
-				if captured_projectiles.is_empty():
-					apply_effect(EffectType.SPEED_MULT, self, 0.65)
-				apply_effect(EffectType.SPEED_MULT, self, death_ray_slowdown)
-				fire_death_ray(delta)
-			elif captured_projectiles.is_empty():
-				toggle_retaliation(false)
+			fire_death_ray(delta)
 		else:
-			death_ray_angle = Vector2.RIGHT.angle_to(global_position.direction_to(get_global_mouse_position()))
+			death_ray_angle = Vector2.RIGHT.angle_to(global_position.direction_to(retaliation_target_point))
+			if retaliating and captured_projectiles.is_empty():
+				toggle_retaliation(false)
+
+func while_retaliating(delta):
+	super(delta)
+	if quasar_amplification and death_ray_charge > 0.0:
+		apply_effect(EffectType.SPEED_MULT, self, death_ray_slowdown * (0.65 if captured_projectiles.is_empty() else 1.0))
 
 func shoot_captured_projectile(proj_index, target_point, repeat = 0):
 	

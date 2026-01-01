@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://ltact53jlbj5"]
+
+[ext_resource type="Script" path="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/TarBomb.gd" id="1_s8we1"]
+[ext_resource type="Texture2D" uid="uid://csfx2s7gsyavg" path="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/tar_bomb.png" id="2_n2s6d"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3ca6v"]
+radius = 3.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_um053"]
+radius = 2.0
+
+[node name="TarProjectile" type="Area2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_s8we1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_3ca6v")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_n2s6d")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+shape = SubResource("CircleShape2D_um053")

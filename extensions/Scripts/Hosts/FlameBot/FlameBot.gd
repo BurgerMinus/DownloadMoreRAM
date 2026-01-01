@@ -5,12 +5,10 @@ var tar_speed_boost_mult = 1.0
 var tar_speed_boost_timer = 0.0
 var tar_bomb = false
 var tar_bomb_charge = 0
-var tar_bomb_texture
+var TarBombScene
 
 func _ready():
 	super()
-	TarProjectileScene = null # forces the scene to be reloaded
-	tar_bomb_texture = Util.get_cached_texture(ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-DownloadMoreRAM").path_join("tar_bomb.png"))
 
 func toggle_enhancement(state):
 	
@@ -27,7 +25,7 @@ func toggle_enhancement(state):
 	
 	tar_deployment_boost += 0.5 * upgrades_to_apply['underpressure']
 	tar_pressure_recharge_rate *= 1.0 + 0.5 * upgrades_to_apply['underpressure']
-	tar_speed_boost_mult = 1.0 + upgrades_to_apply['slipstream']
+	tar_speed_boost_mult = 1.0 + 0.75*upgrades_to_apply['slipstream']
 	tar_durability_mult += 0.5 * upgrades_to_apply['slipstream']
 	tar_bomb = upgrades_to_apply['filtration_purge'] > 0
 	if tar_bomb:
@@ -38,7 +36,7 @@ func _physics_process(delta):
 	super(delta)
 	
 	if tar_speed_boost_timer > 0.0:
-		apply_effect(EffectType.SPEED_MULT, self, tar_speed_boost_mult * min(1, tar_speed_boost_timer*10))
+		apply_effect(EffectType.SPEED_MULT, self, max(tar_speed_boost_mult * min(1, 2*tar_speed_boost_timer), 1.0))
 	else:
 		cancel_effect(EffectType.SPEED_MULT, self)
 
@@ -50,9 +48,9 @@ func update_timers(delta):
 	var overlaps = hitbox.get_overlapping_areas()
 	for area in overlaps:
 		if area.is_in_group('tar'):
-			tar_speed_boost_timer = min(tar_speed_boost_timer + delta, 0.15)
+			tar_speed_boost_timer = min(tar_speed_boost_timer + 3*delta, 0.5)
 			return
-	tar_speed_boost_timer = max(tar_speed_boost_timer - delta, 0.0)
+	tar_speed_boost_timer = max(tar_speed_boost_timer - 2*delta, 0.0)
 	
 
 func while_emitting_tar(delta):
@@ -64,6 +62,10 @@ func while_emitting_tar(delta):
 	else:
 		super(delta)
 
+func emit_tar(offset = Vector2.ZERO, spawn_ignited = false):
+	super(offset, spawn_ignited)
+	tar_speed_boost_timer = min(tar_speed_boost_timer + 0.25, 0.5)
+
 func stop_emitting_tar():
 	super()
 	if tar_bomb:
@@ -72,6 +74,9 @@ func stop_emitting_tar():
 
 func shoot_tar_bomb():
 	var dist = min(global_position.distance_to(get_global_mouse_position()), tar_range) if is_player else tar_range
+	if dist <= 20:
+		dist = 0
+		tar_speed_boost_timer = min(tar_speed_boost_timer + 0.25, 0.5)
 	var target_point = global_position + aim_direction*dist + Vector2.RIGHT.rotated(randf()*TAU)*randf()*10*(dist/100.0)
 	var charge_level = 0
 	if tar_bomb_charge >= 0.1:
@@ -83,26 +88,16 @@ func shoot_tar_bomb():
 	if tar_bomb_charge >= 0.95:
 		charge_level += 1
 	
-	if not is_instance_valid(TarProjectileScene):
-		TarProjectileScene = Util.get_cached_resource('res://Scenes/Hosts/Flamebot/TarProjectile.tscn')
+	if not is_instance_valid(TarBombScene):
+		TarBombScene = load(ModLoaderMod.get_unpacked_dir().path_join('BurgerMinus-DownloadMoreRAM/TarBomb.tscn'))
 	
-	var projectile = TarProjectileScene.instantiate()
-	projectile.causality.set_source(self)
-	projectile.durability_mult = tar_durability_mult
-	projectile.water_mode = water_mode
-	projectile.global_position = global_position
-	projectile.charge_level = charge_level
+	var bomb = TarBombScene.instantiate()
+	bomb.causality.set_source(self)
+	bomb.durability_mult = tar_durability_mult
+	bomb.water_mode = water_mode
+	bomb.global_position = global_position
+	bomb.charge_level = charge_level
 	
-	Util.set_object_elevation(projectile, elevation)
-	get_parent().add_child(projectile)
-	projectile.launch_to_point(target_point)
-	
-	if charge_level > 0:
-		set_bomb_appearance(projectile)
-
-func set_bomb_appearance(bomb):
-	while not is_instance_valid(bomb.sprite):
-		pass
-	bomb.sprite.texture = tar_bomb_texture
-	bomb.sprite.modulate = Color(0.5, 0.5, 0.5, 1)
-	bomb.scale *= 0.1 * (0.5*bomb.charge_level + 1)
+	Util.set_object_elevation(bomb, elevation)
+	get_parent().add_child(bomb)
+	bomb.launch_to_point(target_point)
