@@ -13,12 +13,34 @@ static func melee_attack(chain: ModLoaderHookChain, collider, attack):
 	
 	var source = attack.causality.source
 	
-	if source is ChainBot:
+	if source is ChainBot and source.charge_time >= source.MIN_CHARGE_TIME_TO_LAUNCH*source.min_charge_time_to_launch_mult:
 		var point_defense = source.get_currently_applicable_upgrades()['point_defense']
 		if point_defense:
+			
+			var effective_charge_level = min(1.5, source.charge_time * source.charge_speed)
+			var overcharge_level = effective_charge_level - source.charge_level
+			
+			print(source.charge_level)
+			print(effective_charge_level)
+			print(overcharge_level)
+			
+			var speed_toward_target = source.velocity.length() - (300 if source.footwork else 0)
+			if source.velocity.normalized().dot(source.attack_direction) < -0.5:
+				speed_toward_target = 0.0
+	
+			var velocity_power_mult = 1.0 + max(0.0, (speed_toward_target - 200)/600.0)
+			
+			attack.damage += source.charge_damage*overcharge_level*source.damage_mult*velocity_power_mult
+			attack.impulse += source.aim_direction*(200 + 500*overcharge_level)*source.kb_mult*velocity_power_mult
+			attack.deflect_speed_mult += overcharge_level
+			
 			attack.deflect_type = Attack.DeflectType.TARGET_CURSOR
-			attack.deflect_speed_mult *= 1.5
-			attack.deflect_damage_mult *= 1.5
+			attack.deflect_speed_mult *= 2.0
+			attack.deflect_damage_mult *= 2.0
+	
+	if source is ShotgunBot:
+		attack.deflect_speed_mult = source.deflect_speed_mult
+		attack.deflect_damage_mult = source.deflect_damage_mult
 	
 	var hit_entities = chain.execute_next([collider, attack])
 	

@@ -58,19 +58,19 @@ func player_action():
 		if (captured_projectiles.is_empty() and death_ray_charge < 0.0) or not Input.is_action_pressed("attack1"):
 			toggle_retaliation(false)
 	super()
+	if quasar_amplification:
+		retaliation_target_point = get_global_mouse_position()
 
 func _physics_process(delta):
 	
 	for i in range(0, nearby_projectiles.size()):
 		var p = nearby_projectiles[i]
-		if is_instance_valid(p) and p.is_in_group('ignore_shield'):
+		if is_instance_valid(p) and p.is_in_group('dmr_invincible'):
 			nearby_projectiles[i] = null
 	
 	super(delta)
 	
 	if quasar_amplification:
-		if is_player:
-			retaliation_target_point = get_global_mouse_position()
 		if death_ray_charge > 0.0:
 			var angle_diff = Vector2.RIGHT.rotated(death_ray_angle).angle_to(global_position.direction_to(retaliation_target_point))
 			var turn_speed = death_ray_turn_speed * deg_to_rad(sign(angle_diff)) * (min(bullet_orbit_speed, 33.0) / 6.0)
@@ -211,7 +211,7 @@ func get_death_ray_beam(params: LaserParams):
 	query.transform = collider.global_transform
 	query.set_shape(collider.shape)
 	var results = space_state.intersect_shape(query, 512)
-	
+	print(results)
 	# Sort hits by distance
 	var sorted_results = []
 	for hit in results:

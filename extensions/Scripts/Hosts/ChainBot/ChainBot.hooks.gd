@@ -10,4 +10,7 @@ func toggle_enhancement(chain: ModLoaderHookChain, state):
 	
 	var upgrades_to_apply = deadlift.get_currently_applicable_upgrades()
 	
-	deadlift.charge_speed *= (1 + upgrades_to_apply['point_defense'])
+	var attack_collider = deadlift.get_node_or_null('AttackCollider')
+	
+	if upgrades_to_apply['point_defense'] > 0:
+		deadlift.charge_speed *= 2.0

@@ -1,5 +1,7 @@
 {
-	"dependencies": [],
+	"dependencies": [
+		"BurgerMinus-UpgradeCredits"
+	],
 	"description": "Adds many upgrades.",
 	"extra": {
 		"godot": {

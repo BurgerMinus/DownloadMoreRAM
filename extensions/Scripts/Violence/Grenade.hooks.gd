@@ -2,29 +2,7 @@ extends Object
 
 const TarPuddle = preload('res://Scenes/Violence/TarPuddle.tscn')
 
-var invincible = {}
-var molotov = {}
-var flash = {}
-
 func _ready(chain: ModLoaderHookChain):
-	
-	for grenade in invincible.keys():
-		if not is_instance_valid(grenade):
-			invincible.erase(grenade)
-			molotov.erase(grenade)
-			flash.erase(grenade)
-	
-	for grenade in molotov.keys():
-		if not is_instance_valid(grenade):
-			invincible.erase(grenade)
-			molotov.erase(grenade)
-			flash.erase(grenade)
-	
-	for grenade in flash.keys():
-		if not is_instance_valid(grenade):
-			invincible.erase(grenade)
-			molotov.erase(grenade)
-			flash.erase(grenade)
 	
 	var grenade = chain.reference_object as Grenade
 	
@@ -34,35 +12,37 @@ func _ready(chain: ModLoaderHookChain):
 	
 	if is_instance_valid(router):
 		if 'invincible_grenades' in router and router.invincible_grenades:
-			invincible[grenade] = true
-			grenade.add_to_group('ignore_shield')
+			grenade.add_to_group('dmr_invincible')
 		if 'molotov_grenades' in router and router.molotov_grenades:
-			molotov[grenade] = true
+			grenade.add_to_group('dmr_molotov')
 		if 'impact_grenades' in router and router.impact_grenades:
-			flash[grenade] = true
+			grenade.add_to_group('dmr_flash')
+			grenade.damage *= 0.8
 
 func take_damage(chain: ModLoaderHookChain, attack):
 	
 	var grenade = chain.reference_object as Grenade
 	
-	if not (invincible.has(grenade) and invincible[grenade]):
+	if not (grenade.is_in_group('dmr_invincible')):
 		chain.execute_next([attack])
 
 func on_hit_entity(chain: ModLoaderHookChain, entity):
 	
 	var grenade = chain.reference_object as Grenade
 	
-	if entity is Enemy and grenade.can_hit() and flash.has(grenade) and flash[grenade]:
+	if entity is Enemy and grenade.can_hit() and grenade.is_in_group('dmr_flash'):
+		
 		var damage_mult = 0.8
 		var kb_mult = 0.25
 		var size_mult = 0.67
+		
 		var explosion_attack = Attack.new(grenade, grenade.explosion_damage*damage_mult, 400*grenade.explosion_size*kb_mult)
 		explosion_attack.deflect_type = Attack.DeflectType.REPULSE
 		if grenade.bounces > 0: explosion_attack.bonuses.append(Fitness.Bonus.REBOUND)
 		if grenade.deflected: explosion_attack.bonuses.append(Fitness.Bonus.HOT_POTATO)
 		Violence.spawn_explosion(grenade.global_position if not GameManager.level_manager.in_combat_hub else grenade.position, explosion_attack, grenade.explosion_size*size_mult, 0, true, 'grenade')
 		
-		if molotov.has(grenade) and molotov[grenade]:
+		if grenade.is_in_group('dmr_molotov'):
 			
 			var fire_explosion_attack = Attack.new(grenade, 0, 0)
 			fire_explosion_attack.add_tag(Attack.Tag.FIRE)
@@ -83,7 +63,7 @@ func explode(chain: ModLoaderHookChain):
 	
 	chain.execute_next()
 	
-	if molotov.has(grenade) and molotov[grenade]:
+	if grenade.is_in_group('dmr_molotov'):
 		
 		# use duplicate explosion to light up tar puddles
 		var explosion_attack = Attack.new(grenade, 0, 0)
@@ -103,7 +83,3 @@ func explode(chain: ModLoaderHookChain):
 			tar.z_index = grenade.z_index - 1
 			grenade.get_parent().add_child(tar)
 			tar.ignite(null, false)
-	
-	molotov.erase(grenade)
-	invincible.erase(grenade)
-	flash.erase(grenade)

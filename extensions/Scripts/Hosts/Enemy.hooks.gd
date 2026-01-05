@@ -22,6 +22,7 @@ func toggle_enhancement(chain: ModLoaderHookChain, state):
 	
 	if state:
 		past_hosts[enemy] = 3.0
+		burn_dot.erase(enemy)
 	elif past_hosts.has(enemy):
 		past_hosts[enemy] = 0.0
 
@@ -29,7 +30,7 @@ func can_be_hit(chain: ModLoaderHookChain, _attack):
 	
 	var enemy = chain.reference_object as Enemy
 	
-	if GameManager.player.upgrades['temerity'] > 0 and past_hosts.has(enemy) and past_hosts[enemy] > 0.0:
+	if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host and past_hosts.has(enemy) and past_hosts[enemy] > 0.0:
 		return false
 	
 	return chain.execute_next([_attack])
@@ -69,12 +70,21 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	
 	chain.execute_next([delta])
 	
+	if not enemy.dead and not enemy.can_be_hit(Attack.new(enemy, 0, 0)):
+		if enemy.sprite.material != enemy.default_material:
+			enemy.sprite.material = enemy.default_material
+		enemy.sprite.modulate.a = 0.5
+	else:
+		enemy.sprite.modulate.a = 1.0
+	
 	enemy.time_since_swap = temp
 	
 	if past_hosts.has(enemy):
 		past_hosts[enemy] -= delta
-		if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host and past_hosts[enemy] < 0.0:
-			enemy.health = min(enemy.health, 1)
+		if GameManager.player.upgrades['temerity'] > 0:
+			if past_hosts[enemy] < 0.0:
+				if enemy == GameManager.player.true_host:
+					enemy.health = min(enemy.health, 1)
 	
 	if burn_dot.has(enemy):
 		if burn_dot[enemy][0] > 0.0:
@@ -82,8 +92,8 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 			burn_dot[enemy][1] -= delta
 			if burn_dot[enemy][1] < 0.0:
 				burn_dot[enemy][1] = burn_dot_tick_duration
-				var burn_dot_attack = Attack.new(enemy, burn_dot_dps * burn_dot_tick_duration)
-				burn_dot_attack.bonuses.append(Fitness.Bonus.VANILLA)
+				var burn_dot_attack = Attack.new(burn_dot[enemy][2], burn_dot_dps * burn_dot_tick_duration)
+				burn_dot_attack.bonuses.append(Fitness.Bonus.BBQ)
 				burn_dot_attack.hit_allies = true
 				burn_dot_attack.inflict_on(enemy)
 
@@ -96,8 +106,9 @@ func take_damage(chain: ModLoaderHookChain, attack):
 	if burn_dot_tag in attack.tags:
 		if burn_dot.has(enemy):
 			burn_dot[enemy][0] = burn_dot_duration
+			burn_dot[enemy][2] = attack.causality.original_source
 		else:
-			burn_dot[enemy] = [burn_dot_duration, burn_dot_tick_duration]
+			burn_dot[enemy] = [burn_dot_duration, burn_dot_tick_duration, attack.causality.original_source]
 
 func die(chain: ModLoaderHookChain, attack):
 	
@@ -145,6 +156,7 @@ func spawn_scrap(enemy):
 	scrap.mass *= size_mult
 	enemy.get_parent().add_child(scrap)
 	scrap.global_position = enemy.global_position
+	scrap.global_rotation = randf()*TAU
 	Util.set_object_elevation(scrap, enemy.elevation)
 	
 	return scrap

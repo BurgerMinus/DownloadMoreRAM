@@ -23,6 +23,8 @@ func toggle_enhancement(chain : ModLoaderHookChain, is_player):
 		epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['big_stick']
 		epitaph.paddle_max_vel *= 1.5#1.0 + 0.5*upgrades_to_apply['big_stick']
 		big_stick[epitaph] = true
+	else:
+		big_stick[epitaph] = false
 	
 	jackhammer[epitaph] = upgrades_to_apply['corium_infusion'] > 0
 
@@ -53,7 +55,7 @@ func hit_with_paddle(chain: ModLoaderHookChain, entity):
 		if is_instance_valid(target):
 			dir = entity.global_position.direction_to(target.global_position)
 		
-		var beam_attack = Attack.new(epitaph, max(50, 50 * mult), dir*1000)
+		var beam_attack = Attack.new(epitaph, 75 * max(1.0, mult), dir*1000)
 		beam_attack.ignored.append(entity)
 		for i in range(0, entity.combo):
 			beam_attack.bonuses.append(Fitness.Bonus.RALLY)
@@ -69,6 +71,7 @@ func hit_with_paddle(chain: ModLoaderHookChain, entity):
 		var explosion_attack = Attack.new(epitaph, 100*mult, 800*mult)
 		laser.explosion_attack = explosion_attack
 		laser.explosion_size = 1.33*mult
+		laser.bounce_damage_mult = 0.75
 		for i in range(0, entity.combo):
 			explosion_attack.bonuses.append(Fitness.Bonus.RALLY)
 		
