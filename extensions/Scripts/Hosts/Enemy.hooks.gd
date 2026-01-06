@@ -4,8 +4,6 @@ extends Object
 # value of the entry is the temerity invincibilty timer
 var past_hosts = {}
 
-var repurposed_scrap = {}
-
 var burn_dot = {}
 var burn_dot_duration = 5.0
 var burn_dot_tick_duration = 0.5
@@ -71,6 +69,7 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	chain.execute_next([delta])
 	
 	if not enemy.dead and not enemy.can_be_hit(Attack.new(enemy, 0, 0)):
+#	if GameManager.player.upgrades['temerity'] > 0 and past_hosts.has(enemy) and past_hosts[enemy] > 0.0: 
 		if enemy.sprite.material != enemy.default_material:
 			enemy.sprite.material = enemy.default_material
 		enemy.sprite.modulate.a = 0.5
@@ -123,16 +122,16 @@ func die(chain: ModLoaderHookChain, attack):
 	
 	var killer = attack.causality.original_source
 	if is_instance_valid(killer) and killer is ChainBot and killer.get_currently_applicable_upgrades()['repurposed_scrap'] > 0:
-		repurposed_scrap[enemy] = 3 if enemy is Boss else 1
+		enemy.add_to_group('dmr_scrap')
 
 func actually_die(chain: ModLoaderHookChain):
 	
 	var enemy = chain.reference_object as Enemy
 	
-	if repurposed_scrap.has(enemy) and not enemy.actually_dead:
-		for i in range(0, repurposed_scrap[enemy]):
+	if enemy.is_in_group('dmr_scrap') and not enemy.actually_dead:
+		for i in range(0, 3 if enemy is Boss else 1):
 			spawn_scrap(enemy)
-		repurposed_scrap.erase(enemy)
+		enemy.remove_from_group('dmr_scrap')
 	
 	chain.execute_next()
 

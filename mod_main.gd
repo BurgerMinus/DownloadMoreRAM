@@ -64,7 +64,6 @@ func _init() -> void:
 			'pitching_arm': install_epitaph_upgrades(1)
 			'subcriticality': install_epitaph_upgrades(2)
 			
-			
 	
 	var temp_golem_upgrades = Upgrades.GOLEM_upgrades.duplicate(true)
 	Upgrades.GOLEM_upgrades.clear()
@@ -108,12 +107,12 @@ func _init() -> void:
 		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
 		overwrites.append(icon)
 	
-	for upgrade in golem_upgrade_names:
-		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
-		if icon == null:
-			icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
-		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
-		overwrites.append(icon)
+	for golem_upgrade in golem_upgrade_names:
+		var golem_icon = load(mod_dir_path.path_join("icons/" + golem_upgrade + ".png"))
+		if golem_icon == null:
+			golem_icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
+		golem_icon.take_over_path("res://Art/Upgrades/" + golem_upgrade + ".png")
+		overwrites.append(golem_icon)
 	
 
 func install_steeltoe_upgrades(tier):
@@ -432,8 +431,8 @@ func install_epitaph_upgrades(tier):
 		
 		Upgrades.upgrades['helikon_berra_postulate'] = {
 			'name': 'Helikon-Berra Postulate', # yogi berra + helikon vortex separation process
-			'desc': 'Contraverse? What?', # contraverse holds
-			'effects': ['Max-combo orbs will create a gravity vortex on impact'],
+			'desc': 'Contraversial [sic].', # contraverse holds
+			'effects': ['Max-combo orbs will create a gravity vortex on impact/detonation'],
 			'type': Enemy.EnemyType.BAT,
 			'tier': 2, 
 			'max_stack': 1,

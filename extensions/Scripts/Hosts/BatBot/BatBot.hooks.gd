@@ -1,8 +1,5 @@
 extends Object
 
-var big_stick = {}
-
-var jackhammer = {}
 const jackhammer_delay = 0.35
 const jackhammer_hit_sound = preload("res://Sounds/SoundEffects/Tom/WheelBot/RAM_wheelbotGrenadeImpact.wav")
 
@@ -20,13 +17,16 @@ func toggle_enhancement(chain : ModLoaderHookChain, is_player):
 	var upgrades_to_apply = epitaph.get_currently_applicable_upgrades()
 	
 	if upgrades_to_apply['big_stick'] > 0:
+		epitaph.add_to_group('dmr_big_stick')
 		epitaph.paddle.scale *= 1 + 0.5*upgrades_to_apply['big_stick']
 		epitaph.paddle_max_vel *= 1.5#1.0 + 0.5*upgrades_to_apply['big_stick']
-		big_stick[epitaph] = true
 	else:
-		big_stick[epitaph] = false
+		epitaph.remove_from_group('dmr_big_stick')
 	
-	jackhammer[epitaph] = upgrades_to_apply['corium_infusion'] > 0
+	if upgrades_to_apply['corium_infusion'] > 0:
+		epitaph.add_to_group('dmr_jackhammer')
+	else:
+		epitaph.remove_from_group('dmr_jackhammer')
 
 func start_swing(chain: ModLoaderHookChain, lunge_dir = Vector2.ZERO):
 	
@@ -37,14 +37,14 @@ func start_swing(chain: ModLoaderHookChain, lunge_dir = Vector2.ZERO):
 	
 	chain.execute_next([lunge_dir])
 	
-	if big_stick.has(epitaph):
+	if epitaph.is_in_group('dmr_big_stick'):
 		epitaph.paddle_accel *= 1.75#1.0 + 0.5*big_stick[epitaph]
 
 func hit_with_paddle(chain: ModLoaderHookChain, entity):
 	
 	var epitaph = chain.reference_object as BatBot
 	
-	if jackhammer[epitaph] and entity is EnergyBall and entity.combo >= 2:
+	if epitaph.is_in_group('dmr_jackhammer') and entity is EnergyBall and entity.combo >= 2:
 		
 		var mult = entity.damage_mult * (1.0 + 0.2*(entity.combo - 2))
 		var hit_angle = epitaph.paddle_angle + 0.5*PI*sign(epitaph.paddle_vel)
@@ -75,14 +75,14 @@ func hit_with_paddle(chain: ModLoaderHookChain, entity):
 		for i in range(0, entity.combo):
 			explosion_attack.bonuses.append(Fitness.Bonus.RALLY)
 		
-		fire_jackhammer_laser_delayed(epitaph, entity, laser, epitaph.get_currently_applicable_upgrades()['helikon_berra_postulate'] > 0)
+		fire_jackhammer_laser_delayed(epitaph, entity, laser)
 		
 		if epitaph.was_recently_player():
 			GameManager.time_manager.duck_timescale('player', 0.001, jackhammer_delay, 100)
 	else:
 		chain.execute_next([entity])
 
-func fire_jackhammer_laser_delayed(epitaph, ball, params, vortex = false):
+func fire_jackhammer_laser_delayed(epitaph, ball, params):
 	
 	if GravityVortexScene == null:
 		GravityVortexScene = load(ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-DownloadMoreRAM/GravityVortex.tscn"))
@@ -104,7 +104,7 @@ func fire_jackhammer_laser_delayed(epitaph, ball, params, vortex = false):
 	
 	epitaph.bat_strike_audio.play()
 	
-	var ball_recall_position = fire_jackhammer_laser(ball, params, vortex)
+	var ball_recall_position = fire_jackhammer_laser(epitaph, ball, params)
 	var epitaph_position = ball.causality.original_source.global_position
 	
 	if ball.combo > ball.max_combo or ball_recall_position.distance_to(epitaph_position) > 1024:
@@ -114,7 +114,7 @@ func fire_jackhammer_laser_delayed(epitaph, ball, params, vortex = false):
 	ball.global_position = ball_recall_position
 	ball.launch_to_point(epitaph_position, 1.0, 60)
 
-func fire_jackhammer_laser(ball, params, vortex):
+func fire_jackhammer_laser(epitaph, ball, params):
 	
 	var ball_recall_position = null
 	var num_hits = 0
@@ -122,6 +122,7 @@ func fire_jackhammer_laser(ball, params, vortex):
 	
 	var laser = Violence.LaserBeamScene.instantiate()
 	var attack = params.attack
+	var vortex = ball.is_in_group('dmr_vortex')
 	
 	# Add laser to scene and set elevation
 	Util.set_object_elevation(laser, Util.elevation_from_z_index(attack.causality.source.z_index))
@@ -217,7 +218,7 @@ func fire_jackhammer_laser(ball, params, vortex):
 		var entity = col.get_parent()
 		#if not (entity is Enemy or entity is PhysicsActor): continue
 		
-		if attack.duplicate().inflict_on(entity):
+		if not entity is EnergyBall and attack.duplicate().inflict_on(entity):
 			if entity is Enemy:
 				attack.bonuses.append(Fitness.Bonus.LASER_PIERCE)
 		else:
@@ -301,7 +302,7 @@ func fire_jackhammer_laser(ball, params, vortex):
 		bounced_laser.origin = impact_point
 		bounced_laser.apply_intensity_mult(params.bounce_damage_mult)
 		if best_candidate:
-			ball_recall_position = fire_jackhammer_laser(ball, bounced_laser, vortex)
+			ball_recall_position = fire_jackhammer_laser(epitaph, ball, bounced_laser)
 	
 	# Handle laser visuals
 	var sprite = laser.get_node('Sprite')
@@ -328,6 +329,26 @@ func fire_jackhammer_laser(ball, params, vortex):
 		ball.set_combo(ball.combo + 1)
 	
 	return ball_recall_position
+
+func nuke_delayed(epitaph, ball):
+	
+	var hit_audio = AudioStreamPlayer2D.new()
+	hit_audio.stream = jackhammer_hit_sound
+	hit_audio.global_position = ball.global_position
+	hit_audio.volume_db += 10
+	ball.get_tree().current_scene.add_child(hit_audio)
+	hit_audio.connect("finished", Callable(hit_audio, "queue_free"))
+	hit_audio.play()
+	
+	if epitaph.was_recently_player():
+		GameManager.time_manager.duck_timescale('player', 0.001, jackhammer_delay, 100)
+	
+	await ball.get_tree().create_timer(jackhammer_delay*0.133).timeout
+	
+	var mult = ball.damage_mult * (1.0 + 0.2*(ball.combo))
+	Violence.spawn_explosion(ball.global_position, Attack.new(epitaph, 100*mult, 800*mult), 1.5*mult)
+	
+	ball.queue_free()
 
 func get_auto_aim_target(epitaph, beam_origin, hit_dir):
 	
@@ -361,12 +382,3 @@ func get_auto_aim_target(epitaph, beam_origin, hit_dir):
 		if epitaph.AI.point_has_LOS_to_entity(beam_origin, entity, epitaph.elevation) and not entity is EnergyBall:
 			return entity
 	return null
-
-func die(chain: ModLoaderHookChain, attack = null):
-	
-	var epitaph = chain.reference_object as Enemy
-	
-	chain.execute_next([attack])
-	
-	jackhammer.erase(epitaph)
-	big_stick.erase(epitaph)
