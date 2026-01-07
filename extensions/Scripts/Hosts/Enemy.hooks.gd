@@ -32,7 +32,6 @@ func can_be_hit(chain: ModLoaderHookChain, _attack):
 		return false
 	
 	return chain.execute_next([_attack])
-	
 
 func get_currently_applicable_upgrades(chain: ModLoaderHookChain):
 	

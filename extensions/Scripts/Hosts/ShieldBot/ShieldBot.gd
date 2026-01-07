@@ -332,9 +332,9 @@ func inflict_tackle_attack(entity):
 	velocity = true_velocity
 
 func inflict_shield_attack():
-	var shield_attack = Attack.new(self, shield_attack_damage)
-	shield_attack.stun = shield_attack_stun
 	for e in nearby_enemies:
+		var shield_attack = Attack.new(self, shield_attack_damage)
+		shield_attack.stun = shield_attack_stun
 		if not is_in_shield_AOE(e.global_position) or (e.was_recently_player() == was_recently_player()): continue
 		shield_attack.inflict_on(e)
 		if randf() < max_shield_attack_cooldown:

@@ -15,7 +15,7 @@ var upgrade_names = [
 	'big_stick', 'helikon_berra_postulate', 'corium_infusion'
 	]
 
-var golem_upgrade_names = ['mimesis', 'temerity', 'bloodlust']
+var golem_upgrade_names = ['mimesis', 'temerity', 'bloodlust', 'desperation', 'echopraxia']
 
 func _init() -> void:
 	
@@ -79,7 +79,9 @@ func _init() -> void:
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
 	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/EnemyAI.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/EnemyAI.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Enemy.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Enemy.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/GolemSpider.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/GolemSpider.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ShotgunBot/ShotgunBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ShotgunBot/ShotgunBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
@@ -92,6 +94,7 @@ func _init() -> void:
 	
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Violence.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Violence.hooks.gd"))
 	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Structs/Attack.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Structs/Attack.hooks.gd"))
+	ModLoaderMod.add_hook(attack_init, "res://Scripts/Violence/Structs/Attack.gd", "_init")
 	
 	ModLoaderMod.install_script_hooks("res://Scripts/Player/SwapManager.gd", mod_dir_path.path_join("extensions/Scripts/Player/SwapManager.hooks.gd"))
 	
@@ -113,7 +116,20 @@ func _init() -> void:
 			golem_icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
 		golem_icon.take_over_path("res://Art/Upgrades/" + golem_upgrade + ".png")
 		overwrites.append(golem_icon)
+
+# im so mad that this has to be here and not in attacks.hooks.gd my organization is in shambles
+func attack_init(chain: ModLoaderHookChain, source_, damage_ = 0, impulse_ = Vector2.ZERO):
 	
+	var attack = chain.reference_object as Attack
+	
+	chain.execute_next([source_, damage_, impulse_])
+	
+	if not is_instance_valid(attack.causality.original_source):
+		return
+	
+	if attack.causality.original_source.is_in_group('dmr_hit_allies'):
+		attack.hit_allies = true
+		attack.hit_source = false
 
 func install_steeltoe_upgrades(tier):
 	
@@ -134,7 +150,7 @@ func install_steeltoe_upgrades(tier):
 		Upgrades.upgrades['hollow_pointer'] = {
 			'name': 'Hollow Pointer', # haha you get it bc pointers and robots haha get it
 			'desc': 'Even metal will bleed.', # gabriel ultrakill
-			'effects': ['Bullets induce non-stacking damage over time'],
+			'effects': ['Pellets induce non-stacking damage over time'],
 			'type': Enemy.EnemyType.SHOTGUN,
 			'tier': 2, 
 			'max_stack': 1,
@@ -145,7 +161,7 @@ func install_steeltoe_upgrades(tier):
 		Upgrades.upgrades['embedded_vision'] = {
 			'name': 'Embedded Vision',
 			'desc': 'Nanomachines, son.', # nice argument senator
-			'effects': ['Bullets home in on nearby targets'],
+			'effects': ['Pellets home in on nearby targets'],
 			'type': Enemy.EnemyType.SHOTGUN,
 			'tier': 2, 
 			'max_stack': 1,
@@ -160,7 +176,7 @@ func install_steeltoe_upgrades(tier):
 		Upgrades.upgrades['flak_shell'] = {
 			'name': 'Flak Shell', # astroflux reference
 			'desc': 'No parry required.', # roundabout ultrakill reference
-			'effects': ['Bullets explode on contact'],
+			'effects': ['Pellets explode on contact'],
 			'type': Enemy.EnemyType.SHOTGUN,
 			'tier': 2, 
 			'max_stack': 1,
@@ -175,7 +191,7 @@ func install_steeltoe_upgrades(tier):
 		Upgrades.upgrades['volume_settings_overclock'] = {
 			'name': 'Volume Settings Overclock',
 			'desc': 'Noise-cancelling headphones recommended.',
-			'effects': ['Performing a Nail Driver greatly boosts the size and power of the Resonance Hammer, but does not fire bullets'],
+			'effects': ['Performing a Nail Driver greatly boosts the size and power of the Resonance Hammer, but does not fire pellets'],
 			'type': Enemy.EnemyType.SHOTGUN,
 			'tier': 2, 
 			'max_stack': 1,
@@ -471,11 +487,18 @@ func install_golem_upgrades():
 		'credits': "Concept by cheats_blamesman\nImplementation by BurgerMinus"
 	}
 	
-	# havent figured out how to design this yet
-	#Upgrades.GOLEM_upgrades['desperation'] = {
-	#	'name': 'Desperation',
-	#	'desc': '',
-	#	'effects': ['MITE is invincible for 3 seconds upon ejection', '3x MITE energy drain when damaged / over time'],
-	#	'max_stack': 1,
-	#	'credits': "Concept by AquaTail\nImplementation by BurgerMinus"
-	#}
+	Upgrades.GOLEM_upgrades['echopraxia'] = {
+		'name': 'Echopraxia',
+		'desc': 'Mimicry/Mockery.',
+		'effects': ['Nearby enemies of the same host type will mirror your actions', 'Affected hosts can still damage you'],
+		'max_stack': 1,
+		'credits': "Concept by TheTimesweeper and CampfireCollective\nImplementation by BurgerMinus"
+	}
+	
+	Upgrades.GOLEM_upgrades['desperation'] = {
+		'name': 'Desperation',
+		'desc': 'Last/First Stand.',
+		'effects': ['MITE is invincible and will not drain global energy for 3 seconds upon ejection', '3x MITE global energy drain'],
+		'max_stack': 1,
+		'credits': "Concept by AquaTail\nImplementation by BurgerMinus"
+	}

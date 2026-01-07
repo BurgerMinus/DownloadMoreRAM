@@ -11,3 +11,14 @@ func inflict_on(chain: ModLoaderHookChain, target):
 		return false
 	else:
 		return chain.execute_next([target])
+
+func duplicate(chain: ModLoaderHookChain):
+	
+	var attack = chain.reference_object as Attack
+	
+	var d = chain.execute_next()
+	
+	# fixes the resonance bug (not really my job but yk since im already here)
+	d.deflect_added_stun = attack.deflect_added_stun
+	
+	return d
