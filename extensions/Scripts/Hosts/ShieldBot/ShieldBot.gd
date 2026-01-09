@@ -303,7 +303,7 @@ func get_death_ray_beam(params: LaserParams):
 	# Handle laser visuals
 	var sprite = laser.get_node('Sprite')
 	sprite.texture = laser.rail_beam
-#	laser.anim_frame = death_ray_frame
+#	laser.anim_frame += 1
 	laser.last_frame = 6
 	laser.frame_width = 64
 	

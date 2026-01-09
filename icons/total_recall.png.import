@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://q1ijl1o8nx11"
-path="res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"
+uid="uid://dr6laap2bq2a6"
+path="res://.godot/imported/total_recall.png-32e1e4a47ee914766f5f4cb5f4fc5936.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/temerity.png"
-dest_files=["res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/total_recall.png"
+dest_files=["res://.godot/imported/total_recall.png-32e1e4a47ee914766f5f4cb5f4fc5936.ctex"]
 
 [params]
 

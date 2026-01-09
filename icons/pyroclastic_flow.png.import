@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://q1ijl1o8nx11"
-path="res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"
+uid="uid://cepsexqgdhjis"
+path="res://.godot/imported/pyroclastic_flow.png-26f7378dfd0c8d4af97b744815daba3f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/temerity.png"
-dest_files=["res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/pyroclastic_flow.png"
+dest_files=["res://.godot/imported/pyroclastic_flow.png-26f7378dfd0c8d4af97b744815daba3f.ctex"]
 
 [params]
 

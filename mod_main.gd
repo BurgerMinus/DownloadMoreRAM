@@ -21,6 +21,57 @@ func _init() -> void:
 	
 	mod_dir_path = ModLoaderMod.get_unpacked_dir().path_join(MOD_DIR)
 	
+	reorder_and_install_upgrades()
+	
+	if ModLoaderMod.is_mod_loaded("BurgerMinus-EndpointManagement"):
+		var EM_dir_path = ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-EndpointManagement")
+		ModLoaderMod.install_script_hooks(EM_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/GolemBoss.gd"), mod_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/GolemBoss.hooks.gd"))
+	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/EnemyAI.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/EnemyAI.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Enemy.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Enemy.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/GolemSpider.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/GolemSpider.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ShotgunBot/ShotgunBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ShotgunBot/ShotgunBot.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
+	
+	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/Grapple.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Bullet.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Bullet.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/EnergyBall.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/EnergyBall.hooks.gd"))
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Violence.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Violence.hooks.gd"))
+	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Structs/Attack.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Structs/Attack.hooks.gd"))
+	ModLoaderMod.add_hook(attack_init, "res://Scripts/Violence/Structs/Attack.gd", "_init")
+	
+	ModLoaderMod.install_script_hooks("res://Scripts/Player/SwapManager.gd", mod_dir_path.path_join("extensions/Scripts/Player/SwapManager.hooks.gd"))
+	
+	handle_overwrites()
+
+# im so mad that this has to be here and not in attacks.hooks.gd my organization is in shambles
+func attack_init(chain: ModLoaderHookChain, source_, damage_ = 0, impulse_ = Vector2.ZERO):
+	
+	var attack = chain.reference_object as Attack
+	
+	chain.execute_next([source_, damage_, impulse_])
+	
+	if not is_instance_valid(attack.causality.original_source):
+		return
+	
+	var source = attack.causality.original_source
+	if source.is_in_group('dmr_player_echopraxia'):
+		if not source.is_in_group('dmr_melog_echopraxia') or randf() > 0.5:
+			attack.hit_allies = true
+			attack.hit_source = false
+
+func reorder_and_install_upgrades():
+	
 	var temp_upgrades = Upgrades.upgrades.duplicate(true)
 	Upgrades.upgrades.clear()
 	
@@ -72,64 +123,6 @@ func _init() -> void:
 		if upgrade == 'thorn':
 			install_golem_upgrades()
 		Upgrades.GOLEM_upgrades[upgrade] = temp_golem_upgrades[upgrade]
-	
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/SaberBot.gd"))
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ShieldBot/ShieldBot.gd"))
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ArcherBot/ArcherBot.gd"))
-	
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/EnemyAI.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/EnemyAI.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Enemy.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Enemy.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/GolemSpider.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/GolemSpider.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ShotgunBot/ShotgunBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ShotgunBot/ShotgunBot.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/ChainBot/ChainBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/ChainBot.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/BatBot.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/BatBot.hooks.gd"))
-	
-	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/ChainBot/Grapple.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Bullet.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Bullet.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Grenade.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Grenade.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/SaberBot/FreeSaber.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/SaberBot/FreeSaber.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/BatBot/EnergyBall.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/BatBot/EnergyBall.hooks.gd"))
-	
-	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Violence.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Violence.hooks.gd"))
-	ModLoaderMod.install_script_hooks("res://Scripts/Violence/Structs/Attack.gd", mod_dir_path.path_join("extensions/Scripts/Violence/Structs/Attack.hooks.gd"))
-	ModLoaderMod.add_hook(attack_init, "res://Scripts/Violence/Structs/Attack.gd", "_init")
-	
-	ModLoaderMod.install_script_hooks("res://Scripts/Player/SwapManager.gd", mod_dir_path.path_join("extensions/Scripts/Player/SwapManager.hooks.gd"))
-	
-	# completely cosmetic change, allows event horizon effect to display properly
-	var shield = load(mod_dir_path.path_join("Circle_234.png"))
-	shield.take_over_path("res://Art/Shields/Circle_234.png")
-	overwrites.append(shield)
-	
-	for upgrade in upgrade_names:
-		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
-		if icon == null:
-			icon = load(mod_dir_path.path_join("icons/placeholder_icon.png"))
-		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
-		overwrites.append(icon)
-	
-	for golem_upgrade in golem_upgrade_names:
-		var golem_icon = load(mod_dir_path.path_join("icons/" + golem_upgrade + ".png"))
-		if golem_icon == null:
-			golem_icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
-		golem_icon.take_over_path("res://Art/Upgrades/" + golem_upgrade + ".png")
-		overwrites.append(golem_icon)
-
-# im so mad that this has to be here and not in attacks.hooks.gd my organization is in shambles
-func attack_init(chain: ModLoaderHookChain, source_, damage_ = 0, impulse_ = Vector2.ZERO):
-	
-	var attack = chain.reference_object as Attack
-	
-	chain.execute_next([source_, damage_, impulse_])
-	
-	if not is_instance_valid(attack.causality.original_source):
-		return
-	
-	if attack.causality.original_source.is_in_group('dmr_hit_allies'):
-		attack.hit_allies = true
-		attack.hit_source = false
 
 func install_steeltoe_upgrades(tier):
 	
@@ -502,3 +495,24 @@ func install_golem_upgrades():
 		'max_stack': 1,
 		'credits': "Concept by AquaTail\nImplementation by BurgerMinus"
 	}
+
+func handle_overwrites():
+	
+	# completely cosmetic change, allows event horizon effect to display properly
+	var shield = load(mod_dir_path.path_join("Circle_234.png"))
+	shield.take_over_path("res://Art/Shields/Circle_234.png")
+	overwrites.append(shield)
+	
+	for upgrade in upgrade_names:
+		var icon = load(mod_dir_path.path_join("icons/" + upgrade + ".png"))
+		if icon == null:
+			icon = load(mod_dir_path.path_join("icons/placeholder_icon.png"))
+		icon.take_over_path("res://Art/Upgrades/" + upgrade + ".png")
+		overwrites.append(icon)
+	
+	for golem_upgrade in golem_upgrade_names:
+		var golem_icon = load(mod_dir_path.path_join("icons/" + golem_upgrade + ".png"))
+		if golem_icon == null:
+			golem_icon = load(mod_dir_path.path_join("icons/placeholder_icon_golem.png"))
+		golem_icon.take_over_path("res://Art/Upgrades/" + golem_upgrade + ".png")
+		overwrites.append(golem_icon)

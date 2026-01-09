@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://q1ijl1o8nx11"
-path="res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"
+uid="uid://cd2uiy577wtic"
+path="res://.godot/imported/flak_shell.png-dfccac751baa2490f371718c61c819c1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/temerity.png"
-dest_files=["res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/flak_shell.png"
+dest_files=["res://.godot/imported/flak_shell.png-dfccac751baa2490f371718c61c819c1.ctex"]
 
 [params]
 

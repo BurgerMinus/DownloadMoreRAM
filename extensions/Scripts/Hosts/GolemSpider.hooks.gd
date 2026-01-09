@@ -14,7 +14,10 @@ func take_damage(chain: ModLoaderHookChain, attack):
 	
 	var mite = chain.reference_object as GolemSpider
 	
-	if GameManager.player.upgrades['desperation'] > 0 and mite.is_player:
+	var player_check = GameManager.player.upgrades['desperation'] > 0 and mite.is_player
+	var melog_check = not mite.is_player and is_instance_valid(mite.enemy_golem) and 'golem_upgrades' in mite.enemy_golem and mite.enemy_golem.golem_upgrades['desperation'] 
+	
+	if player_check or melog_check:
 		var mult = 0.0 if desperation_invincibility[mite] > 0.0 else 3.0
 		attack.damage *= mult
 	
@@ -26,7 +29,10 @@ func misc_update(chain: ModLoaderHookChain, delta):
 	
 	desperation_invincibility[mite] -= delta
 	
-	if GameManager.player.upgrades['desperation'] > 0 and mite.is_player:
+	var player_check = GameManager.player.upgrades['desperation'] > 0 and mite.is_player
+	var melog_check = not mite.is_player and is_instance_valid(mite.enemy_golem) and 'golem_upgrades' in mite.enemy_golem and mite.enemy_golem.golem_upgrades['desperation'] 
+	
+	if player_check or melog_check:
 		var mult = 0.0 if desperation_invincibility[mite] > 0.0 else 3.0
 		if mite.lunging:
 			mite.while_lunging(delta)

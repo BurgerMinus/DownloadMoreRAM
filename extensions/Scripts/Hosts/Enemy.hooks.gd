@@ -4,6 +4,13 @@ extends Object
 # value of the entry is the temerity invincibilty timer
 var past_hosts = {}
 
+# same as above but for enemy golem
+var boss_hosts = {}
+
+var melog = null
+
+var echopraxia_radius = 100
+
 var burn_dot = {}
 var burn_dot_duration = 5.0
 var burn_dot_tick_duration = 0.5
@@ -18,6 +25,11 @@ func toggle_enhancement(chain: ModLoaderHookChain, state):
 	
 	chain.execute_next([state])
 	
+	if is_instance_valid(enemy.enemy_golem):
+		boss_hosts[enemy] = 3.0
+	elif boss_hosts.has(enemy):
+		boss_hosts[enemy] = 0.0
+	
 	if state:
 		past_hosts[enemy] = 3.0
 		burn_dot.erase(enemy)
@@ -28,8 +40,13 @@ func can_be_hit(chain: ModLoaderHookChain, _attack):
 	
 	var enemy = chain.reference_object as Enemy
 	
-	if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host and past_hosts.has(enemy) and past_hosts[enemy] > 0.0:
-		return false
+	if enemy.is_player and GameManager.player.upgrades['temerity'] > 0:
+		if past_hosts.has(enemy) and past_hosts[enemy] > 0.0:
+			return false
+	 
+	if enemy.enemy_golem and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['temerity']:
+		if boss_hosts.has(enemy) and boss_hosts[enemy] > 0.0:
+			return false
 	
 	return chain.execute_next([_attack])
 
@@ -37,9 +54,23 @@ func get_currently_applicable_upgrades(chain: ModLoaderHookChain):
 	
 	var enemy = chain.reference_object as Enemy
 	
-	var temp = enemy.is_player
-	if GameManager.player.upgrades['mimesis'] > 0 and past_hosts.has(enemy):
-		enemy.is_player = true
+	var player_flag = false
+	var melog_flag = false
+	
+	if not is_instance_valid(GameManager.player):
+		return chain.execute_next()
+	
+	if not enemy.is_player and not Upgrades.get_antiupgrade_value("shared_upgrades") > 0:
+		if enemy.player_enhancements_active:
+			player_flag = true
+		if GameManager.player.upgrades['mimesis'] > 0 and past_hosts.has(enemy):
+			player_flag = true
+	
+	if not enemy.enemy_golem:
+		if enemy.was_recently_enemy_golem():
+			melog_flag = true
+		if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and boss_hosts.has(enemy):
+			melog_flag = true
 	
 	var to_apply = chain.execute_next()
 	
@@ -47,13 +78,11 @@ func get_currently_applicable_upgrades(chain: ModLoaderHookChain):
 		
 		if Upgrades.upgrades[upgrade].type == enemy.enemy_type or Upgrades.upgrades[upgrade].type == Enemy.EnemyType.UNKNOWN:
 			
-			# handle residual control case (normally not necessary but yk)
-			if enemy.player_enhancements_active and not enemy.is_player and Upgrades.get_antiupgrade_value("shared_upgrades") == 0:
-				if upgrade in GameManager.player.upgrades:
-					to_apply[upgrade] += GameManager.player.upgrades[upgrade]
-	
-	if not temp:
-		enemy.is_player = false
+			if melog_flag and upgrade in enemy.prev_enemy_golem.upgrades:
+				to_apply[upgrade] += enemy.prev_enemy_golem.upgrades[upgrade]
+			
+			if player_flag and upgrade in GameManager.player.upgrades:
+				to_apply[upgrade] += GameManager.player.upgrades[upgrade]
 	
 	return to_apply
 
@@ -61,39 +90,45 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 	
 	var enemy = chain.reference_object as Enemy
 	
+	# it will be so convenient to have a constant reference to this little guy
+	if melog == null and enemy.enemy_golem:
+		melog = enemy.enemy_golem
+	
+	if not is_instance_valid(GameManager.player):
+		chain.execute_next([delta])
+		return
+	
 	var temp = enemy.time_since_swap + delta
 	if GameManager.player.upgrades['mimesis'] > 0 and past_hosts.has(enemy) and not enemy.is_player and temp <= 6:
 		enemy.time_since_swap *= 0.33
 	
+	var temp2 = enemy.time_since_enemy_golem_swap + delta
+	if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and not enemy.enemy_golem and temp2 <= 6:
+		enemy.time_since_enemy_golem_swap *= 0.33
+	
 	chain.execute_next([delta])
 	
-	if not enemy.dead and not enemy.can_be_hit(Attack.new(enemy, 0, 0)):
-#	if GameManager.player.upgrades['temerity'] > 0 and past_hosts.has(enemy) and past_hosts[enemy] > 0.0: 
-		if enemy.sprite.material != enemy.default_material:
-			enemy.sprite.material = enemy.default_material
-		enemy.sprite.modulate.a = 0.5
-	else:
-		enemy.sprite.modulate.a = 1.0
-	
 	enemy.time_since_swap = temp
+	enemy.time_since_enemy_golem_swap = temp2
 	
-	if past_hosts.has(enemy):
-		past_hosts[enemy] -= delta
-		if GameManager.player.upgrades['temerity'] > 0:
-			if past_hosts[enemy] < 0.0:
-				if enemy == GameManager.player.true_host:
-					enemy.health = min(enemy.health, 1)
+	handle_echopraxia_groups(enemy)
+	handle_invincibility_visual(enemy)
+	handle_temerity_self_damage(enemy, delta)
+	handle_bleed_damage(enemy, delta)
+
+func player_move(chain: ModLoaderHookChain, _delta):
 	
-	if burn_dot.has(enemy):
-		if burn_dot[enemy][0] > 0.0:
-			burn_dot[enemy][0] -= delta
-			burn_dot[enemy][1] -= delta
-			if burn_dot[enemy][1] < 0.0:
-				burn_dot[enemy][1] = burn_dot_tick_duration
-				var burn_dot_attack = Attack.new(burn_dot[enemy][2], burn_dot_dps * burn_dot_tick_duration)
-				burn_dot_attack.bonuses.append(Fitness.Bonus.BBQ)
-				burn_dot_attack.hit_allies = true
-				burn_dot_attack.inflict_on(enemy)
+	var enemy = chain.reference_object as Enemy
+	
+	if enemy.is_player and enemy.is_in_group('dmr_melog_echopraxia') and is_instance_valid(melog) and is_instance_valid(melog.host):
+		if not GameManager.player.upgrades['echopraxia'] > 0 or randf() > 0.5:
+			if enemy.global_position.distance_to(melog.host.global_position) <= echopraxia_radius*0.8:
+				enemy.target_velocity = melog.host.target_velocity
+			else:
+				enemy.target_velocity = enemy.max_speed * enemy.global_position.direction_to(melog.host.global_position)
+			return
+	
+	chain.execute_next([_delta])
 
 func take_damage(chain: ModLoaderHookChain, attack):
 	
@@ -133,6 +168,58 @@ func actually_die(chain: ModLoaderHookChain):
 		enemy.remove_from_group('dmr_scrap')
 	
 	chain.execute_next()
+
+### HELPER FUNCTIONS START HERE
+
+func handle_echopraxia_groups(enemy):
+	
+	enemy.remove_from_group('dmr_player_echopraxia')
+	enemy.remove_from_group('dmr_melog_echopraxia')
+	
+	if enemy.is_player or enemy.enemy_golem:
+		if is_instance_valid(enemy.AI) and enemy.AI is EnemyAI:
+			var enemies = enemy.AI.get_enemies_in_radius(echopraxia_radius)
+			for e in enemies:
+				if e.enemy_type != enemy.enemy_type: continue
+				if not e.is_player and enemy.is_player and GameManager.player.upgrades['echopraxia'] > 0:
+					e.add_to_group('dmr_player_echopraxia')
+				if not e.enemy_golem and enemy.enemy_golem and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['echopraxia']:
+					e.add_to_group('dmr_melog_echopraxia')
+
+func handle_invincibility_visual(enemy):
+#	if GameManager.player.upgrades['temerity'] > 0 and past_hosts.has(enemy) and past_hosts[enemy] > 0.0: 
+	if not enemy.dead and not enemy.can_be_hit(Attack.new(enemy, 0, 0)):
+		if enemy.sprite.material != enemy.default_material:
+			enemy.sprite.material = enemy.default_material
+		enemy.sprite.modulate.a = 0.5
+	else:
+		enemy.sprite.modulate.a = 1.0
+
+func handle_temerity_self_damage(enemy, delta):
+	
+	if past_hosts.has(enemy):
+		past_hosts[enemy] -= delta
+		if GameManager.player.upgrades['temerity'] > 0 and enemy == GameManager.player.true_host:
+			if past_hosts[enemy] < 0.0:
+				enemy.health = min(enemy.health, 1)
+	
+	if boss_hosts.has(enemy):
+		boss_hosts[enemy] -= delta
+		if is_instance_valid(enemy.enemy_golem) and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['temerity']:
+			if boss_hosts[enemy] < 0.0:
+				enemy.health = min(enemy.health, 1)
+
+func handle_bleed_damage(enemy, delta):
+	if burn_dot.has(enemy):
+		if burn_dot[enemy][0] > 0.0:
+			burn_dot[enemy][0] -= delta
+			burn_dot[enemy][1] -= delta
+			if burn_dot[enemy][1] < 0.0:
+				burn_dot[enemy][1] = burn_dot_tick_duration
+				var burn_dot_attack = Attack.new(burn_dot[enemy][2], burn_dot_dps * burn_dot_tick_duration)
+				burn_dot_attack.bonuses.append(Fitness.Bonus.BBQ)
+				burn_dot_attack.hit_allies = true
+				burn_dot_attack.inflict_on(enemy)
 
 func spawn_scrap(enemy):
 	

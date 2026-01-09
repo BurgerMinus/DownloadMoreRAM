@@ -21,7 +21,9 @@
 			"image": null,
 			"incompatibilities": [],
 			"load_before": [],
-			"optional_dependencies": [],
+			"optional_dependencies": [
+				"BurgerMinus-EndpointManagement"
+			],
 			"tags": []
 		}
 	},

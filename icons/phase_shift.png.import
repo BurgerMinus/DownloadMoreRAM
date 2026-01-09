@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://eosvlhdiej3x"
-path="res://.godot/imported/quasar_amplification_2.png-175a6e17bde6a3f2e2a99d74af49662f.ctex"
+uid="uid://04vg2l2lempu"
+path="res://.godot/imported/phase_shift.png-d57351669c94c558709aae4973cc2583.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/quasar_amplification_2.png"
-dest_files=["res://.godot/imported/quasar_amplification_2.png-175a6e17bde6a3f2e2a99d74af49662f.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/phase_shift.png"
+dest_files=["res://.godot/imported/phase_shift.png-d57351669c94c558709aae4973cc2583.ctex"]
 
 [params]
 

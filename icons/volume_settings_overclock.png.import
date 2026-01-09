@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://q1ijl1o8nx11"
-path="res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"
+uid="uid://dg8dlqnjbfxo3"
+path="res://.godot/imported/volume_settings_overclock.png-a4ff33dd08c9217b33efbad829725673.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/temerity.png"
-dest_files=["res://.godot/imported/temerity.png-36ec1dfdd9eb7967003a8dadaaaa7552.ctex"]
+source_file="res://mods-unpacked/BurgerMinus-DownloadMoreRAM/icons/volume_settings_overclock.png"
+dest_files=["res://.godot/imported/volume_settings_overclock.png-a4ff33dd08c9217b33efbad829725673.ctex"]
 
 [params]
 

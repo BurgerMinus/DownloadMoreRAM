@@ -80,7 +80,7 @@ func despawn(chain: ModLoaderHookChain):
 	
 	var bullet = chain.reference_object as Bullet
 	
-	if bullet.explosion_size > 0:
+	if bullet.explosion_size > 0 and not bullet.in_stasis:
 		var explosion_attack = Attack.new(bullet.causality.original_source, bullet.explosion_damage, bullet.explosion_kb)
 		Violence.spawn_explosion(bullet.global_position, explosion_attack, bullet.explosion_size)
 	
