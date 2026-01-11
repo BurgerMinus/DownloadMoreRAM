@@ -51,7 +51,6 @@ func update_timers(delta):
 			tar_speed_boost_timer = min(tar_speed_boost_timer + 3*delta, 0.5)
 			return
 	tar_speed_boost_timer = max(tar_speed_boost_timer - 2*delta, 0.0)
-	
 
 func while_emitting_tar(delta):
 	if tar_bomb:

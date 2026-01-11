@@ -46,7 +46,7 @@ func update(chain: ModLoaderHookChain, delta_):
 			m = false
 		
 		
-		if p and (not (m or enemy.enemy_golem) or randf() > 0.5): # PLAYER CONTROL SUCCEEDS
+		if p and (not (m or (enemy.enemy_golem and melog.golem_upgrades.has('echopraxia') and melog.golem_upgrades['echopraxia'])) or randf() > 0.5): # PLAYER CONTROL SUCCEEDS
 			
 			# mimic player action
 			if enemy.enemy_golem:

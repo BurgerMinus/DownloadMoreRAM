@@ -15,6 +15,12 @@ func toggle_enhancement(state):
 	sword_break = upgrades_to_apply['percussive_strike']
 	zen = upgrades_to_apply['medium_maximization']
 
+func misc_update(delta):
+	super(delta)
+	if zen and is_instance_valid(AI) and AI is SaberBotAI:
+		if AI.current_state == AI.States.SLASH or AI.current_state == AI.States.CHAIN_SLASH:
+			AI.state_health = 999
+
 func player_action():
 	
 	if zen and in_kill_mode and not slashing and Input.is_action_just_pressed("attack2"):

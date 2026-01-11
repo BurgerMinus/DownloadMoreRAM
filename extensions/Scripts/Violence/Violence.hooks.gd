@@ -14,15 +14,11 @@ static func melee_attack(chain: ModLoaderHookChain, collider, attack):
 	var source = attack.causality.source
 	
 	if source is ChainBot and source.charge_time >= source.MIN_CHARGE_TIME_TO_LAUNCH*source.min_charge_time_to_launch_mult:
-		var point_defense = source.get_currently_applicable_upgrades()['point_defense']
-		if point_defense:
+		
+		if source.is_in_group('point_defense'):
 			
 			var effective_charge_level = min(1.5, source.charge_time * source.charge_speed)
 			var overcharge_level = effective_charge_level - source.charge_level
-			
-			print(source.charge_level)
-			print(effective_charge_level)
-			print(overcharge_level)
 			
 			var speed_toward_target = source.velocity.length() - (300 if source.footwork else 0)
 			if source.velocity.normalized().dot(source.attack_direction) < -0.5:
@@ -34,7 +30,7 @@ static func melee_attack(chain: ModLoaderHookChain, collider, attack):
 			attack.impulse += source.aim_direction*(200 + 500*overcharge_level)*source.kb_mult*velocity_power_mult
 			attack.deflect_speed_mult += overcharge_level
 			
-			attack.deflect_type = Attack.DeflectType.TARGET_CURSOR
+			attack.deflect_type = Attack.DeflectType.TARGET_CURSOR if source.is_player else Attack.DeflectType.TARGET_SOURCE
 			attack.deflect_speed_mult *= 2.0
 			attack.deflect_damage_mult *= 2.0
 	

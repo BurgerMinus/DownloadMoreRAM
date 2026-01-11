@@ -44,7 +44,7 @@ func can_be_hit(chain: ModLoaderHookChain, _attack):
 		if past_hosts.has(enemy) and past_hosts[enemy] > 0.0:
 			return false
 	 
-	if enemy.enemy_golem and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['temerity']:
+	if enemy.enemy_golem and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades.has('temerity') and enemy.enemy_golem.golem_upgrades['temerity']:
 		if boss_hosts.has(enemy) and boss_hosts[enemy] > 0.0:
 			return false
 	
@@ -69,7 +69,7 @@ func get_currently_applicable_upgrades(chain: ModLoaderHookChain):
 	if not enemy.enemy_golem:
 		if enemy.was_recently_enemy_golem():
 			melog_flag = true
-		if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and boss_hosts.has(enemy):
+		if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades.has('mimesis') and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and boss_hosts.has(enemy):
 			melog_flag = true
 	
 	var to_apply = chain.execute_next()
@@ -103,7 +103,7 @@ func _physics_process(chain: ModLoaderHookChain, delta):
 		enemy.time_since_swap *= 0.33
 	
 	var temp2 = enemy.time_since_enemy_golem_swap + delta
-	if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and not enemy.enemy_golem and temp2 <= 6:
+	if enemy.prev_enemy_golem and 'golem_upgrades' in enemy.prev_enemy_golem and enemy.prev_enemy_golem.golem_upgrades.has('mimesis') and enemy.prev_enemy_golem.golem_upgrades['mimesis'] and not enemy.enemy_golem and temp2 <= 6:
 		enemy.time_since_enemy_golem_swap *= 0.33
 	
 	chain.execute_next([delta])
@@ -173,18 +173,36 @@ func actually_die(chain: ModLoaderHookChain):
 
 func handle_echopraxia_groups(enemy):
 	
-	enemy.remove_from_group('dmr_player_echopraxia')
-	enemy.remove_from_group('dmr_melog_echopraxia')
+	if not is_instance_valid(enemy):
+		return
 	
-	if enemy.is_player or enemy.enemy_golem:
-		if is_instance_valid(enemy.AI) and enemy.AI is EnemyAI:
-			var enemies = enemy.AI.get_enemies_in_radius(echopraxia_radius)
-			for e in enemies:
-				if e.enemy_type != enemy.enemy_type: continue
-				if not e.is_player and enemy.is_player and GameManager.player.upgrades['echopraxia'] > 0:
-					e.add_to_group('dmr_player_echopraxia')
-				if not e.enemy_golem and enemy.enemy_golem and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['echopraxia']:
-					e.add_to_group('dmr_melog_echopraxia')
+	var player_echopraxia = false
+	
+	if is_instance_valid(GameManager.player) and is_instance_valid(GameManager.player.true_host):
+		player_echopraxia = true
+		player_echopraxia = player_echopraxia and GameManager.player.upgrades['echopraxia'] > 0
+		player_echopraxia = player_echopraxia and GameManager.player.true_host is Enemy
+		player_echopraxia = player_echopraxia and enemy.enemy_type == GameManager.player.true_host.enemy_type
+		player_echopraxia = player_echopraxia and enemy.global_position.distance_to(GameManager.player.true_host.global_position) <= echopraxia_radius
+	
+	var melog_echopraxia = false
+	
+	if is_instance_valid(melog) and is_instance_valid(melog.host):
+		melog_echopraxia = true
+		melog_echopraxia = melog_echopraxia and 'golem_upgrades' in melog and melog.golem_upgrades.has('echopraxia') and melog.golem_upgrades['echopraxia']
+		melog_echopraxia = melog_echopraxia and melog.host is Enemy
+		melog_echopraxia = melog_echopraxia and enemy.enemy_type == melog.host.enemy_type
+		melog_echopraxia = melog_echopraxia and enemy.global_position.distance_to(melog.host.global_position) <= echopraxia_radius
+	
+	if player_echopraxia:
+		enemy.add_to_group('dmr_player_echopraxia')
+	else:
+		enemy.remove_from_group('dmr_player_echopraxia')
+	
+	if melog_echopraxia:
+		enemy.add_to_group('dmr_melog_echopraxia')
+	else:
+		enemy.remove_from_group('dmr_melog_echopraxia')
 
 func handle_invincibility_visual(enemy):
 #	if GameManager.player.upgrades['temerity'] > 0 and past_hosts.has(enemy) and past_hosts[enemy] > 0.0: 
@@ -205,7 +223,7 @@ func handle_temerity_self_damage(enemy, delta):
 	
 	if boss_hosts.has(enemy):
 		boss_hosts[enemy] -= delta
-		if is_instance_valid(enemy.enemy_golem) and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades['temerity']:
+		if is_instance_valid(enemy.enemy_golem) and 'golem_upgrades' in enemy.enemy_golem and enemy.enemy_golem.golem_upgrades.has('temerity') and enemy.enemy_golem.golem_upgrades['temerity']:
 			if boss_hosts[enemy] < 0.0:
 				enemy.health = min(enemy.health, 1)
 
@@ -216,7 +234,7 @@ func handle_bleed_damage(enemy, delta):
 			burn_dot[enemy][1] -= delta
 			if burn_dot[enemy][1] < 0.0:
 				burn_dot[enemy][1] = burn_dot_tick_duration
-				var burn_dot_attack = Attack.new(burn_dot[enemy][2], burn_dot_dps * burn_dot_tick_duration)
+				var burn_dot_attack = Attack.new(burn_dot[enemy][2] if is_instance_valid(burn_dot[enemy][2]) else self, burn_dot_dps * burn_dot_tick_duration)
 				burn_dot_attack.bonuses.append(Fitness.Bonus.BBQ)
 				burn_dot_attack.hit_allies = true
 				burn_dot_attack.inflict_on(enemy)

@@ -14,3 +14,6 @@ func toggle_enhancement(chain: ModLoaderHookChain, state):
 	
 	if upgrades_to_apply['point_defense'] > 0:
 		deadlift.charge_speed *= 2.0
+		deadlift.add_to_group('point_defense')
+	else:
+		deadlift.remove_from_group('point_defense')

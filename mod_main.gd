@@ -23,9 +23,13 @@ func _init() -> void:
 	
 	reorder_and_install_upgrades()
 	
+#	# nicely asking ira to take care of em3 extensions once em3 is actually loaded
+#	ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Bosses/Lv3/Ira.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/Ira.hooks.gd"))
+
 	if ModLoaderMod.is_mod_loaded("BurgerMinus-EndpointManagement"):
 		var EM_dir_path = ModLoaderMod.get_unpacked_dir().path_join("BurgerMinus-EndpointManagement")
 		ModLoaderMod.install_script_hooks(EM_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/GolemBoss.gd"), mod_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/GolemBoss.hooks.gd"))
+#		ModLoaderMod.install_script_hooks("res://Scripts/Hosts/Bosses/Lv3/GolemBoss.gd", mod_dir_path.path_join("extensions/Scripts/Hosts/Bosses/Lv3/GolemBoss.hooks.gd"))
 	
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/FlameBot/FlameBot.gd"))
 	ModLoaderMod.install_script_extension(mod_dir_path.path_join("extensions/Scripts/Hosts/WheelBot/WheelBot.gd"))
@@ -277,7 +281,7 @@ func install_aphid_upgrades(tier):
 			'type': Enemy.EnemyType.FLAME,
 			'tier': 2, 
 			'max_stack': 1,
-			'ai_useable': true,
+			'ai_useable': false,
 			'credits': "Concept and Sprites by cheats_blamesman\nImplementation by BurgerMinus"
 		}
 
@@ -404,7 +408,7 @@ func install_thistle_upgrades(tier):
 			'type': Enemy.EnemyType.ARCHER,
 			'tier': 2, 
 			'max_stack': 1,
-			'ai_useable': true,
+			'ai_useable': false,
 			'credits': "Upgrade by BurgerMinus"
 		}
 	
@@ -457,8 +461,12 @@ func install_golem_upgrades():
 		'desc': 'Loving memories / Persistent nightmares.',
 		'effects': ['Post-swap residual control lasts 3x as long', 'Enemies permanently retain your upgrades when swapping out'],
 		'max_stack': 1,
+		'precludes': ['efficiency'],
 		'credits': "Concept by Gwonam\nImplementation by BurgerMinus"
 	}
+	if not Upgrades.GOLEM_upgrades['efficiency'].has('precludes'):
+		Upgrades.GOLEM_upgrades['efficiency']['precludes'] = []
+	Upgrades.GOLEM_upgrades['efficiency']['precludes'].append('mimesis')
 	
 	Upgrades.GOLEM_upgrades['temerity'] = {
 		'name': 'Temerity',

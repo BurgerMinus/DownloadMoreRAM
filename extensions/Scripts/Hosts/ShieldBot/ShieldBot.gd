@@ -211,7 +211,7 @@ func get_death_ray_beam(params: LaserParams):
 	query.transform = collider.global_transform
 	query.set_shape(collider.shape)
 	var results = space_state.intersect_shape(query, 512)
-	print(results)
+	
 	# Sort hits by distance
 	var sorted_results = []
 	for hit in results:
@@ -395,5 +395,5 @@ func on_laser_deflection(impact_point, params):
 
 func _on_shield_area_entered(area):
 	super(area)
-	if tackling and gravity_tackle and area is Projectile:
+	if tackling and gravity_tackle and area is Projectile and not area.in_stasis:
 		on_projectile_tackled(area)

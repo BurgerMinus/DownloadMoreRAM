@@ -43,8 +43,10 @@ func shoot(chain: ModLoaderHookChain):
 		if steeltoe.blast_dynamo:
 			steeltoe.melee_sprite.speed_scale *= 3.0
 		
-		steeltoe.melee_collider.scale *= 2.0
-		steeltoe.melee_sprite.scale *= 2.0
+		steeltoe.melee_collider.scale.x += 1.0
+		steeltoe.melee_collider.scale.y += 1.0
+		steeltoe.melee_sprite.scale.x += 1.0
+		steeltoe.melee_sprite.scale.y += 1.0
 		steeltoe.deflect_speed_mult *= 2.0
 		steeltoe.deflect_damage_mult *= 2.0
 		

@@ -20,75 +20,44 @@ func _ready(chain: ModLoaderHookChain):
 	enemy_golem.golem_upgrades['mimesis'] = false
 	enemy_golem.golem_upgrades['temerity'] = false
 	
-	enemy_golem.give_golem_upgrades = true #|#
-
-func generate_golem_upgrade_set(chain: ModLoaderHookChain):
-	
-	var enemy_golem = chain.reference_object
-	
-	var upgrade_set = chain.execute_next()
-	
-	if randf() < 0.25:
-		upgrade_set = Util.choose_random([
+	# update golem upgrade sets
+	var presets = [
 			['bloodlust', 'indulgence'], 
 			['echopraxia', 'mimesis'], 
-			['temerity', 'haste']])
+			['temerity', 'haste']]
+	for preset in presets:
+		if randf() < 0.25:
+			preset.append('desperation')
+		enemy_golem.g_upgrades.append(preset)
 	
-	if randf() < 0.1:
-		upgrade_set.append('desperation')
+	# update hyperopia sets
+	enemy_golem.h_upgrades[Enemy.EnemyType.SHOTGUN].append('flak_shell')
+	enemy_golem.h_upgrades[Enemy.EnemyType.WHEEL].append('pyroclastic_flow')
+	enemy_golem.h_upgrades[Enemy.EnemyType.CHAIN].append('point_defense')
+	enemy_golem.h_upgrades[Enemy.EnemyType.SHIELD].append('event_horizon')
+	enemy_golem.h_upgrades[Enemy.EnemyType.SABER].append(['percussive_strike', 2])
+	enemy_golem.h_upgrades[Enemy.EnemyType.BAT].append('big_stick')
 	
-	return upgrade_set
-
-func generate_hyperopia_sets(chain: ModLoaderHookChain):
-	
-	var enemy_golem = chain.reference_object
-	
-	var hyperopia_upgrade_sets = chain.execute_next()
-	
-	hyperopia_upgrade_sets[Enemy.EnemyType.SHOTGUN].append('flak_shell')
-	hyperopia_upgrade_sets[Enemy.EnemyType.WHEEL].append('pyroclastic_flow')
-	hyperopia_upgrade_sets[Enemy.EnemyType.CHAIN].append('point_defelse')
-	hyperopia_upgrade_sets[Enemy.EnemyType.SHIELD].append('event_horizon')
-	hyperopia_upgrade_sets[Enemy.EnemyType.SABER].append(['percussive_strike', 2])
-	hyperopia_upgrade_sets[Enemy.EnemyType.BAT].append('big_stick')
-	
-	return hyperopia_upgrade_sets
-
-func generate_obsession_set(chain: ModLoaderHookChain, bot):
-	
-	var enemy_golem = chain.reference_object
-	
-	var obsession_set = chain.execute_next(bot)
-	
-	match bot:
-		"Steeltoe": 
-			obsession_set.erase('soldering_fingers')
-			obsession_set.erase('induction_barrel')
-			if randf() < 0.5:
-				obsession_set.append('soldering_fingers')
-			else:
-				obsession_set.append('embedded_vision')
-			if randf() < 0.5:
-				obsession_set.append('induction_barrel')
-			else:
-				obsession_set.append('flak_shell')
-		"Router":
-			if 'shaped_charges' in obsession_set:
-				obsession_set.append('phase_shift')
-			else:
-				obsession_set.append('pyroclastic_flow')
-		"Aphid": 
-			obsession_set.append(['slipstream', 2])
-		"Deadlift":
-			obsession_set.append('point_defense')
-		"Collider":
-			obsession_set.append('event_horizon')
-		"Tachi":
-			obsession_set.append(['percussive_strike', 2])
-		"Epitaph":
-			obsession_set.append('big_stick')
-	
-	return obsession_set
+	# update obsession sets
+	enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].erase('soldering_fingers')
+	enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].erase('induction_barrel')
+	if randf() < 0.5:
+		enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].append('soldering_fingers')
+	else:
+		enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].append('embedded_vision')
+	if randf() < 0.5:
+		enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].append('induction_barrel')
+	else:
+		enemy_golem.o_upgrades[Enemy.EnemyType.SHOTGUN].append('flak_shell')
+	if 'shaped_charges' in enemy_golem.o_upgrades[Enemy.EnemyType.WHEEL]:
+		enemy_golem.o_upgrades[Enemy.EnemyType.WHEEL].append('phase_shift')
+	else:
+		enemy_golem.o_upgrades[Enemy.EnemyType.WHEEL].append('pyroclastic_flow')
+	enemy_golem.o_upgrades[Enemy.EnemyType.FLAME].append(['slipstream', 2])
+	enemy_golem.o_upgrades[Enemy.EnemyType.CHAIN].append('point_defense')
+	enemy_golem.o_upgrades[Enemy.EnemyType.SHIELD].append('event_horizon')
+	enemy_golem.o_upgrades[Enemy.EnemyType.SABER].append(['percussive_strike', 2])
+	enemy_golem.o_upgrades[Enemy.EnemyType.BAT].append('big_stick')
 
 func _process(chain: ModLoaderHookChain, delta):
 	
